@@ -377,9 +377,14 @@ async function submitSetup(e) {
   if (!user || !token) { $("#s-err").textContent = "Συμπλήρωσε όνομα χρήστη και κωδικό."; return; }
   $("#s-err").textContent = "Έλεγχος…";
   try {
-    const r = await fetch(`https://api.github.com/repos/${user}/${DATA_REPO}`, { cache: "no-store", headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" } });
-    if (r.status === 404) { $("#s-err").textContent = "Λάθος όνομα χρήστη ή κωδικός."; return; }
-    if (!r.ok) { $("#s-err").textContent = "Λάθος όνομα χρήστη ή κωδικός."; return; }
+    const h = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" };
+    const me = await fetch("https://api.github.com/user", { cache: "no-store", headers: h });
+    if (me.status === 401) { $("#s-err").textContent = "Ο κωδικός δεν αναγνωρίζεται (401). Αντέγραψέ τον ξανά ολόκληρο, ή φτιάξε νέο."; return; }
+    const r = await fetch(`https://api.github.com/repos/${user}/${DATA_REPO}`, { cache: "no-store", headers: h });
+    if (r.status === 404) { $("#s-err").textContent = `Ο κωδικός είναι σωστός, αλλά δεν βλέπει το «${user}/${DATA_REPO}» (404). Έλεγξε ότι υπάρχει αυτό το repository και ότι το επέλεξες στο Repository access του κωδικού.`; return; }
+    if (!r.ok) { $("#s-err").textContent = `Σφάλμα GitHub (${r.status}).`; return; }
+    const j = await r.json();
+    if (j.permissions && j.permissions.push === false) { $("#s-err").textContent = "Ο κωδικός μπορεί μόνο να διαβάσει. Στο Contents βάλε «Read and write»."; return; }
   } catch (err) { $("#s-err").textContent = "Δεν υπάρχει σύνδεση στο internet."; return; }
   const firstTime = !cfg;
   cfg = { user, token };
