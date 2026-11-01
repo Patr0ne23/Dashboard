@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2a2420">
+<meta name="theme-color" content="#1b2550">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
   --ink: #ffffff;
   --ink-2: rgba(255,255,255,.72);
   --ink-3: rgba(255,255,255,.5);
-  --glass: rgba(40,36,34,.28);
+  --glass: rgba(22,18,44,.26);
   --glass-2: rgba(255,255,255,.14);
   --edge: rgba(255,255,255,.22);
   --accent: #3d8bff;
@@ -33,7 +33,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
-body { background: #2a2420; color: var(--ink); font-family: var(--font); font-size: 14px; line-height: 1.4; overflow-x: hidden; }
+body { background: #1b2550; color: var(--ink); font-family: var(--font); font-size: 14px; line-height: 1.4; overflow-x: hidden; }
 #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
 .bgimg { position: fixed; inset: 0; z-index: 0; background-size: cover; background-position: center; }
 
@@ -100,7 +100,7 @@ svg.i { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-widt
 .card {
   --c: var(--own);
   border-radius: 20px; padding: 8px; display: flex; flex-direction: column; gap: 10px; text-align: left;
-  background: rgba(30,26,24,.32); border: 1px solid var(--edge);
+  background: rgba(20,16,40,.30); border: 1px solid var(--edge);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 10px 30px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.14);
   transition: transform .18s ease, box-shadow .18s ease;
@@ -134,7 +134,7 @@ svg.i { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-widt
 /* Dialog */
 .scrim { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.35); display: none; place-items: center; padding: 16px; }
 .scrim.open { display: grid; }
-.dlg { width: min(440px, 100%); border-radius: 24px; padding: 22px; display: flex; flex-direction: column; gap: 12px; background: rgba(40,36,34,.55); }
+.dlg { width: min(440px, 100%); border-radius: 24px; padding: 22px; display: flex; flex-direction: column; gap: 12px; background: rgba(22,18,44,.55); }
 .dlg h2 { margin: 0 0 4px; font-size: 18px; }
 .dlg label { font-size: 12px; color: var(--ink-2); display: flex; flex-direction: column; gap: 5px; }
 .dlg input, .dlg select { font: inherit; color: #fff; background: rgba(255,255,255,.1); border: 1px solid var(--edge); border-radius: 12px; padding: 9px 11px; }
@@ -163,8 +163,8 @@ body.locked .setup-extra { display: none; }
 
 <header class="top">
   <div class="group">
-    <button class="ibtn glass" type="button" id="btn-filters" aria-label="Φίλτρα"><svg class="i"><use href="#i-sliders"/></svg></button>
-    <button class="ibtn glass hide-sm" type="button" id="btn-bg" aria-label="Αλλαγή φόντου με δική σου φωτογραφία"><svg class="i"><use href="#i-image"/></svg></button>
+    <button class="ibtn glass hide-sm" type="button" id="btn-filters" aria-label="Φίλτρα"><svg class="i"><use href="#i-sliders"/></svg></button>
+    <button class="ibtn glass" type="button" id="btn-bg" aria-label="Αλλαγή φόντου" title="Αλλαγή φόντου"><svg class="i"><use href="#i-image"/></svg></button>
     <input type="file" id="bgfile" accept="image/*" hidden>
   </div>
   <nav class="nav glass" aria-label="Κύριο μενού">
@@ -493,7 +493,7 @@ $("#form").addEventListener("submit", e => {
 });
 
 // Δικό σου φόντο
-$("#btn-bg").addEventListener("click", () => $("#bgfile").click());
+$("#btn-bg").addEventListener("click", e => e.altKey ? $("#bgfile").click() : nextTheme());
 $("#bgfile").addEventListener("change", e => {
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
@@ -502,60 +502,102 @@ $("#bgfile").addEventListener("change", e => {
 });
 try { const bg = localStorage.getItem("gd-bg"); if (bg) $("#bgimg").style.backgroundImage = `url(${bg})`; } catch (e) {}
 
-// ===== Ζωγραφισμένο φόντο: ηλιοβασίλεμα πάνω από λόφους, μέσα από τζαμαρία =====
+// ===== Ζωγραφισμένο φόντο: βουνά πάνω από λίμνη, σε τρία θέματα =====
+const THEMES = {
+  sunset: { name: "Ηλιοβασίλεμα", sky: ["#1b2550", "#4a3477", "#a6497a", "#e57f62", "#fbc98e"], sun: "#fff0c8", glow: "255,190,140", haze: "#e39a8c", dark: "#1a1330", stars: 40, lake: "#2a1d3d" },
+  night:  { name: "Νύχτα", sky: ["#03050f", "#0a1430", "#1b2a5a", "#33467f", "#5b6ea6"], sun: "#f4f1e6", glow: "170,190,255", haze: "#4a5a92", dark: "#05070f", stars: 260, lake: "#060a1a", moon: true },
+  dawn:   { name: "Αυγή", sky: ["#5d86c4", "#8fb2df", "#d7d6e3", "#f4cdb3", "#fde4c9"], sun: "#fffaf0", glow: "255,225,190", haze: "#b9c6dc", dark: "#283449", stars: 0, lake: "#3c4b63" },
+};
+let themeKey = "sunset";
+try { const t = localStorage.getItem("gd-theme"); if (THEMES[t]) themeKey = t; } catch (e) {}
+function hex(c) { const n = parseInt(c.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+function mix(a, b, t) { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(",")})`; }
 function paint() {
+  const T = THEMES[themeKey];
   const cv = $("#bg"), dpr = Math.min(devicePixelRatio || 1, 2);
   const W = innerWidth, H = innerHeight;
   cv.width = W * dpr; cv.height = H * dpr;
-  const g = cv.getContext("2d"); g.scale(dpr, dpr);
-  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const horizon = H * .58;
-  let sky = g.createLinearGradient(0, 0, 0, horizon);
-  sky.addColorStop(0, "#8fa4b8"); sky.addColorStop(.45, "#d9c3a8"); sky.addColorStop(.8, "#f2c58e"); sky.addColorStop(1, "#f7d9b0");
-  g.fillStyle = sky; g.fillRect(0, 0, W, H);
-  const sx = W * .62, sy = horizon * .9;
-  let sun = g.createRadialGradient(sx, sy, 0, sx, sy, W * .45);
-  sun.addColorStop(0, "rgba(255,236,200,.95)"); sun.addColorStop(.12, "rgba(255,214,160,.55)"); sun.addColorStop(1, "rgba(255,200,150,0)");
-  g.fillStyle = sun; g.fillRect(0, 0, W, H);
-  const layers = [["#b9a596", .28], ["#9b8577", .36], ["#7a6457", .46], ["#5a4639", .58], ["#3f3027", .72]];
-  layers.forEach(([col, base], li) => {
-    g.fillStyle = col; g.beginPath(); g.moveTo(0, H);
-    const amp = H * (.03 + li * .012), y0 = horizon + H * (li * .045 - .06);
-    const ph = rnd() * 10, fr = 1.5 + rnd() * 2;
-    for (let x = 0; x <= W; x += 6) {
-      const t = x / W;
-      const y = y0 - amp * (Math.sin(t * fr * Math.PI + ph) * .6 + Math.sin(t * fr * 3.1 + ph * 2) * .3 + Math.sin(t * 17 + ph) * .08);
-      g.lineTo(x, y);
+  const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const horizon = Math.round(H * 0.66);
+
+  // Σκηνή πάνω από τον ορίζοντα σε ξεχωριστό καμβά (για την αντανάκλαση)
+  const up = document.createElement("canvas"); up.width = W * dpr; up.height = horizon * dpr;
+  const u = up.getContext("2d"); u.scale(dpr, dpr);
+  const sky = u.createLinearGradient(0, 0, 0, horizon);
+  T.sky.forEach((c, i) => sky.addColorStop(i / (T.sky.length - 1), c));
+  u.fillStyle = sky; u.fillRect(0, 0, W, horizon);
+
+  for (let i = 0; i < T.stars; i++) {
+    const x = rnd() * W, y = Math.pow(rnd(), 1.6) * horizon * 0.75, r = rnd() * 1.2 + 0.2;
+    u.globalAlpha = (1 - y / (horizon * 0.75)) * (0.4 + rnd() * 0.6);
+    u.fillStyle = "#fff"; u.beginPath(); u.arc(x, y, r, 0, Math.PI * 2); u.fill();
+  }
+  u.globalAlpha = 1;
+
+  const sx = W * 0.66, sy = horizon - H * (T.moon ? 0.36 : 0.13), sr = Math.min(W, H) * (T.moon ? 0.035 : 0.055);
+  let glow = u.createRadialGradient(sx, sy, 0, sx, sy, Math.max(W, H) * 0.55);
+  glow.addColorStop(0, `rgba(${T.glow},.55)`); glow.addColorStop(0.15, `rgba(${T.glow},.22)`); glow.addColorStop(1, `rgba(${T.glow},0)`);
+  u.fillStyle = glow; u.fillRect(0, 0, W, horizon);
+  u.shadowColor = T.sun; u.shadowBlur = sr * 1.5; u.fillStyle = T.sun;
+  u.beginPath(); u.arc(sx, sy, sr, 0, Math.PI * 2); u.fill(); u.shadowBlur = 0;
+
+  // Οροσειρές με θόρυβο και ατμοσφαιρική προοπτική
+  const layers = 6;
+  for (let li = 0; li < layers; li++) {
+    const t = li / (layers - 1);
+    const base = horizon - H * (0.2 - t * 0.17);
+    const amp = H * (0.13 - t * 0.07);
+    const ph = rnd() * 100, oct = [[1.3, 1], [3.1, 0.45], [7.7, 0.18], [19, 0.06], [41, 0.025]];
+    u.beginPath(); u.moveTo(0, horizon);
+    for (let x = 0; x <= W; x += 3) {
+      const k = x / W * 3 + ph; let h = 0;
+      oct.forEach(([f, a], j) => { h += a * (Math.sin(k * f + j * 1.7) * 0.5 + Math.sin(k * f * 1.9 + ph * j) * 0.5); });
+      const peak = Math.max(0, h) * 1.25 + h * 0.35;
+      u.lineTo(x, base - amp * peak);
     }
-    g.lineTo(W, H); g.closePath(); g.fill();
-    let haze = g.createLinearGradient(0, y0 - amp, 0, y0 + H * .2);
-    haze.addColorStop(0, "rgba(247,217,176,.18)"); haze.addColorStop(1, "rgba(247,217,176,0)");
-    g.fillStyle = haze; g.fillRect(0, y0 - amp, W, H * .3);
-  });
-  // Εσωτερικό: πάτωμα και σκιά
-  const floorY = H * .8;
-  let fl = g.createLinearGradient(0, floorY, 0, H);
-  fl.addColorStop(0, "#6b5646"); fl.addColorStop(1, "#3a2c22");
-  g.fillStyle = fl; g.fillRect(0, floorY, W, H - floorY);
-  g.fillStyle = "rgba(255,230,190,.12)"; g.fillRect(0, floorY, W, 2);
-  // Κουφώματα τζαμαρίας
-  g.fillStyle = "#2b221c";
-  const cols = Math.max(3, Math.round(W / 260));
-  for (let i = 0; i <= cols; i++) { const x = i * W / cols; g.fillRect(x - 5, 0, 10, floorY); }
-  g.fillRect(0, 0, W, 14); g.fillRect(0, floorY - 10, W, 10);
-  g.fillStyle = "rgba(255,255,255,.05)";
-  for (let i = 0; i < cols; i++) { const x = i * W / cols + 20; g.beginPath(); g.moveTo(x, 14); g.lineTo(x + 60, 14); g.lineTo(x + 10, floorY - 10); g.lineTo(x - 50, floorY - 10); g.fill(); }
-  // Έπιπλα σε σιλουέτα
-  g.fillStyle = "#c9b8a4"; roundRect(g, W * .06, floorY - H * .05, W * .22, H * .12, 30); g.fill();
-  g.fillStyle = "#b6a28c"; roundRect(g, W * .72, floorY - H * .07, W * .26, H * .15, 30); g.fill();
-  g.fillStyle = "#4a3426"; g.beginPath(); g.ellipse(W * .48, floorY + H * .07, W * .13, H * .025, 0, 0, Math.PI * 2); g.fill();
-  g.fillStyle = "#a99079"; g.beginPath(); g.ellipse(W * .62, floorY + H * .05, W * .035, H * .03, 0, 0, Math.PI * 2); g.fill();
-  // Βινιέτα
-  let v = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, Math.max(W, H) * .8);
-  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(20,12,6,.45)");
+    u.lineTo(W, horizon); u.closePath();
+    const col = mix(T.haze, T.dark, Math.pow(t, 0.8));
+    const mg = u.createLinearGradient(0, base - amp * 1.5, 0, horizon);
+    mg.addColorStop(0, col); mg.addColorStop(1, mix(T.haze, T.dark, Math.max(0, Math.pow(t, 0.8) - 0.25)));
+    u.fillStyle = mg; u.fill();
+    const mist = u.createLinearGradient(0, base - amp * 0.2, 0, horizon);
+    mist.addColorStop(0, "rgba(255,255,255,0)"); mist.addColorStop(1, `rgba(${T.glow},${0.12 * (1 - t) + 0.04})`);
+    u.fillStyle = mist; u.fillRect(0, base - amp * 0.2, W, horizon - base + amp * 0.2);
+  }
+
+  g.drawImage(up, 0, 0, W, horizon);
+
+  // Λίμνη: αντανάκλαση, σκίαση, κυματάκια
+  g.save(); g.translate(0, horizon * 2); g.scale(1, -1);
+  g.globalAlpha = 0.75; g.filter = "blur(2px)"; g.drawImage(up, 0, 0, W, horizon); g.restore();
+  g.filter = "none"; g.globalAlpha = 1;
+  const lk = g.createLinearGradient(0, horizon, 0, H);
+  lk.addColorStop(0, `rgba(${hex(T.lake).join(",")},.35)`); lk.addColorStop(1, `rgba(${hex(T.lake).join(",")},.92)`);
+  g.fillStyle = lk; g.fillRect(0, horizon, W, H - horizon);
+  for (let i = 0; i < 140; i++) {
+    const y = horizon + Math.pow(rnd(), 1.5) * (H - horizon), w = 20 + rnd() * 160 * (1 + (y - horizon) / (H - horizon));
+    const x = Math.abs(rnd() * W - sx) < W * 0.12 ? sx + (rnd() - 0.5) * W * 0.2 : rnd() * W;
+    g.fillStyle = `rgba(255,255,255,${0.04 + rnd() * 0.08})`; g.fillRect(x - w / 2, y, w, 1);
+  }
+  g.fillStyle = `rgba(${T.glow},.35)`; g.fillRect(0, horizon, W, 1);
+
+  // Κόκκος φιλμ και βινιέτα
+  const n = document.createElement("canvas"); n.width = n.height = 128;
+  const nx = n.getContext("2d"), id = nx.createImageData(128, 128);
+  for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 14; }
+  nx.putImageData(id, 0, 0);
+  g.fillStyle = g.createPattern(n, "repeat"); g.fillRect(0, 0, W, H);
+  const v = g.createRadialGradient(W / 2, H * 0.45, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.85);
+  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(5,3,12,.5)");
   g.fillStyle = v; g.fillRect(0, 0, W, H);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", T.sky[0]);
 }
-function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function nextTheme() {
+  const keys = Object.keys(THEMES); themeKey = keys[(keys.indexOf(themeKey) + 1) % keys.length];
+  try { localStorage.setItem("gd-theme", themeKey); localStorage.removeItem("gd-bg"); } catch (e) {}
+  $("#bgimg").style.backgroundImage = ""; paint(); toast(`Φόντο: ${THEMES[themeKey].name}`);
+}
 let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(paint, 120); });
 
 buildControls(); render(); paint(); initCloud();
