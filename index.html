@@ -142,6 +142,12 @@ svg.i { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-widt
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
 .ghost { border: 1px solid var(--edge); background: transparent; padding: 9px 16px; border-radius: 999px; cursor: pointer; }
+body.locked header, body.locked .shell { display: none !important; }
+body.locked #setup { background: transparent; }
+.login-brand { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 4px; text-align: center; }
+.login-brand img { width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+body:not(.locked) .login-brand { display: none; }
+body.locked .setup-extra { display: none; }
 .hint { margin: 0; font-size: 13px; color: var(--ink-2); }
 .hint.err { color: #ffb0b0; min-height: 1em; }
 .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 11; padding: 9px 16px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; }
@@ -227,10 +233,10 @@ svg.i { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-widt
 </div>
 <div class="scrim" id="setup">
   <form class="dlg glass" id="setup-form" aria-labelledby="setup-h">
-    <h2 id="setup-h">Συγχρονισμός Mac και iPhone</h2>
-    <p class="hint">Το κάνεις μία φορά σε κάθε συσκευή. Τα έργα σου αποθηκεύονται στο ιδιωτικό σου <b>dashboard-data</b> στο GitHub.</p>
-    <label for="s-user">Όνομα χρήστη GitHub<input id="s-user" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="π.χ. fotis-x"></label>
-    <label for="s-token">Κωδικός (GitHub token)<input id="s-token" type="password" autocomplete="current-password" placeholder="github_pat_…"></label>
+    <div class="login-brand"><img src="icon-180.png" alt=""><h2 id="setup-h">Σύνδεση</h2></div>
+    <h2 class="setup-extra">Ρυθμίσεις συγχρονισμού</h2>
+    <label for="s-user">Όνομα χρήστη<input id="s-user" autocomplete="username" autocapitalize="off" spellcheck="false" ></label>
+    <label for="s-token">Κωδικός<input id="s-token" type="password" autocomplete="current-password" ></label>
     <p class="hint err" id="s-err" role="alert"></p>
     <div class="actions">
       <button type="button" class="ghost" id="s-disconnect" hidden>Αποσύνδεση</button>
@@ -342,9 +348,11 @@ const save = () => {
   dirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(push, 600);
 };
 
+function lock(on) { document.body.classList.toggle("locked", on); }
 function initCloud() {
+  if (!cfg) { lock(true); mode = "local"; openSetup(true); return; }
+  lock(false);
   try { const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); if (Array.isArray(c)) { projects = c; render(); } } catch (e) {}
-  if (!cfg) { mode = "local"; setSync("local"); openSetup(true); return; }
   pull();
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pull(); });
   addEventListener("focus", pull);
@@ -370,15 +378,15 @@ async function submitSetup(e) {
   $("#s-err").textContent = "Έλεγχος…";
   try {
     const r = await fetch(`https://api.github.com/repos/${user}/${DATA_REPO}`, { cache: "no-store", headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" } });
-    if (r.status === 404) { $("#s-err").textContent = `Δεν βρέθηκε το «${user}/${DATA_REPO}», ή ο κωδικός δεν έχει πρόσβαση σε αυτό.`; return; }
-    if (!r.ok) { $("#s-err").textContent = "Ο κωδικός δεν έγινε δεκτός. Έλεγξε ότι τον αντέγραψες ολόκληρο."; return; }
+    if (r.status === 404) { $("#s-err").textContent = "Λάθος όνομα χρήστη ή κωδικός."; return; }
+    if (!r.ok) { $("#s-err").textContent = "Λάθος όνομα χρήστη ή κωδικός."; return; }
   } catch (err) { $("#s-err").textContent = "Δεν υπάρχει σύνδεση στο internet."; return; }
   const firstTime = !cfg;
   cfg = { user, token };
   try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (err) {}
   $("#setup").classList.remove("open");
   if (firstTime) initCloud(); else pull();
-  toast("Ο συγχρονισμός ενεργοποιήθηκε");
+  if (firstTime) toast("Καλώς ήρθες!");
 }
 const state = { cat: "all", status: new Set(), q: "", quick: "all" };
 const $ = s => document.querySelector(s);
@@ -548,7 +556,7 @@ let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(pai
 buildControls(); render(); paint(); initCloud();
 $("#setup-form").addEventListener("submit", submitSetup);
 $("#s-close").addEventListener("click", () => $("#setup").classList.remove("open"));
-$("#s-disconnect").addEventListener("click", () => { try { localStorage.removeItem(CFG_KEY); } catch (e) {} cfg = null; sha = null; $("#setup").classList.remove("open"); setSync("local"); toast("Αποσυνδέθηκε από αυτή τη συσκευή"); });
+$("#s-disconnect").addEventListener("click", () => { try { localStorage.removeItem(CFG_KEY); } catch (e) {} try { localStorage.removeItem(CACHE_KEY); } catch (e) {} cfg = null; sha = null; projects = []; render(); lock(true); openSetup(true); });
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
