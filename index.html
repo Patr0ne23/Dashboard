@@ -87,7 +87,7 @@ main { min-width: 0; padding: calc(18px + env(safe-area-inset-top)) calc(20px + 
 .motto { position: absolute; right: 34px; bottom: 30px; z-index: 1; font-family: var(--hand); font-size: 30px; line-height: 1.05; color: #fff; transform: rotate(-8deg); text-align: right; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
 .motto i { display: block; height: 2px; width: 70%; margin: 8px 0 0 auto; background: var(--accent-2); border-radius: 2px; }
 .topbar { position: absolute; top: 14px; right: 14px; z-index: 2; display: flex; gap: 10px; align-items: center; }
-.today { font-size: 12px; color: rgba(255,255,255,.85); margin-right: 4px; }
+.datebadge { font-size: 12px; color: rgba(255,255,255,.85); margin-right: 4px; }
 .search { display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 36px; border-radius: 10px; background: rgba(8,9,20,.6); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--ink-2); }
 .search input { border: 0; background: transparent; outline: none; width: 160px; color: #fff; }
 .search input::placeholder { color: var(--ink-3); }
@@ -295,41 +295,98 @@ body.locked .setup-extra { display: none; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .stack { display: grid; grid-template-columns: 1fr 1fr; }
 }
+.agenda, .tabbar-only { display: none; }
 @media (max-width: 860px) {
+  body { background-attachment: scroll; }
   .app { grid-template-columns: 1fr; }
-  aside.side { position: sticky; top: 0; z-index: 10; height: auto; flex-direction: row; align-items: center; padding: calc(10px + env(safe-area-inset-top)) 12px 10px; gap: 10px; border-right: 0; border-bottom: 1px solid var(--line); }
-  .brand b, .brand small, .side-foot { display: none; }
-  .brand { padding: 0; }
-  .brand img { width: 34px; height: 34px; }
-  nav.menu { flex-direction: row; overflow-x: auto; scrollbar-width: none; gap: 2px; }
-  nav.menu button { padding: 8px 10px; white-space: nowrap; }
-  nav.menu button span { display: none; }
-  nav.menu button[aria-current="page"] span { display: inline; }
-  main { padding: 14px 12px calc(24px + env(safe-area-inset-bottom)); }
-  .hero { height: 210px; }
-  .hero h1 { font-size: 30px; }
-  .hero-text { left: 18px; bottom: 22px; }
-  .motto { display: none; }
-  .search, .today { display: none; }
+  aside.side {
+    position: fixed; top: auto; bottom: 0; left: 0; right: 0; z-index: 15; height: auto;
+    flex-direction: row; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); gap: 0;
+    border-right: 0; border-top: 1px solid rgba(255,255,255,.1); background: rgba(10,12,24,.82);
+    backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%);
+  }
+  .brand, .side-foot { display: none; }
+  nav.menu { flex-direction: row; width: 100%; justify-content: space-around; gap: 0; }
+  nav.menu button { flex: 1; flex-direction: column; gap: 3px; padding: 6px 2px; font-size: 10.5px; border-radius: 10px; align-items: center; text-align: center; color: var(--ink-3); min-height: 48px; justify-content: center; }
+  nav.menu button svg { width: 22px; height: 22px; }
+  nav.menu button[aria-current="page"] { background: transparent; box-shadow: none; color: var(--accent-2); }
+  nav.menu .m-hide { display: none; }
+  .tabbar-only { display: flex; }
+  main { padding: calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(86px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); gap: 12px; }
+  .hero { height: 168px; border-radius: 18px; }
+  .hero h1 { font-size: 26px; }
+  .hero p { font-size: 12.5px; gap: 6px; }
+  .hero p span:nth-child(3) { display: none; }
+  .hero p span + span::before { margin-right: 6px; }
+  .hero-text { left: 16px; bottom: 16px; right: 16px; }
+  .topbar { top: 10px; right: 10px; gap: 8px; }
+  .motto, .search, .datebadge { display: none; }
+  .ibtn, .avatar { width: 34px; height: 34px; }
+  .sync-m { position: absolute; left: 14px; top: 14px; z-index: 2; }
   .day { min-height: 64px; padding: 4px; }
   .ev small { display: none; }
 }
 @media (max-width: 640px) {
-  .board { grid-template-columns: 1fr; grid-template-areas: "side" "cal" "habits" "goals" "week" "motiv" "journal" "quote"; }
-  .stack { grid-template-columns: 1fr; }
-  .ph { flex-wrap: wrap; }
-  .cal-nav b { min-width: 0; }
+  .board { grid-template-columns: 1fr; gap: 12px; grid-template-areas: "side" "cal" "habits" "goals" "week" "motiv" "journal" "quote"; }
+  .stack { grid-template-columns: 1fr; gap: 12px; }
+  .panel { padding: 14px; border-radius: 16px; }
   .stats { gap: 10px; }
-  .stat { padding: 12px; grid-template-columns: auto 1fr; }
-  .stat .ico { width: 34px; height: 34px; }
-  .stat .val { font-size: 22px; }
+  .stat { padding: 12px; grid-template-columns: auto 1fr; gap: 2px 10px; }
+  .stat .ico { width: 34px; height: 34px; border-radius: 10px; grid-row: 1 / span 2; }
+  .stat .ico svg { width: 16px; height: 16px; }
+  .stat .lbl { font-size: 12px; }
+  .stat .val { font-size: 21px; }
+  .stat .sub { grid-column: 1 / span 2; font-size: 11px; margin-top: 4px; }
+  .stat .bar { grid-column: 1 / span 2; }
   .stat .corner { display: none; }
-  .ev { padding: 2px 3px; font-size: 9.5px; border-left-width: 2px; }
-  .cal .dow { font-size: 10.5px; }
+  .ph { flex-wrap: wrap; row-gap: 8px; }
+
+
+  .cal-nav b { min-width: 0; font-size: 13px; }
+  .cal .dow { font-size: 10.5px; padding: 6px 0; }
+  .day { min-height: 46px; align-items: center; gap: 3px; padding: 4px 2px; }
+  .day .n { font-size: 12.5px; width: 26px; height: 26px; }
+  .day.sel .n { box-shadow: 0 0 0 1.5px var(--accent-2); }
+  .ev, .more { display: none; }
+  .dots { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; max-width: 100%; }
+  .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--c); }
+  .week .day { min-height: 60px; }
+  .agenda { display: block; margin-top: 12px; }
+  .agenda h3 { margin: 0 0 6px; font-size: 13px; color: var(--ink-2); font-weight: 600; }
+  .agenda .row { padding: 10px 0; }
+  .agenda .bar-c { width: 4px; align-self: stretch; border-radius: 2px; background: var(--c); flex: none; }
+  .row { min-height: 44px; }
+  .check { width: 22px; height: 22px; border-radius: 6px; }
+  .tag { font-size: 10.5px; padding: 3px 7px; }
+  .x { opacity: .55; padding: 8px; margin: -6px -6px -6px 0; }
+  .habits th, .habits td { padding-left: 0; padding-right: 0; }
+  .hname { gap: 8px; font-size: 12.5px; }
+  .hico { width: 26px; height: 26px; border-radius: 8px; }
+  .dot { width: 24px; height: 24px; }
+  .goal { grid-template-columns: 36px 1fr auto; }
+  .goal .gi { width: 36px; height: 36px; }
+  .jr { grid-template-columns: 52px 36px 1fr; gap: 10px; }
+  .jr .thumb { width: 36px; height: 32px; }
+  .quote { min-height: 170px; }
+  .quote blockquote { font-size: 16px; }
+  .pv-head h1 { font-size: 22px; flex-basis: 100%; }
+  .pills { max-width: 100%; }
+  .primary#proj-add { position: fixed; right: calc(16px + env(safe-area-inset-right)); bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 14; border-radius: 999px; padding: 14px 18px; }
   .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card .hd { height: 64px; }
+  .card h3 { font-size: 13px; }
+  .card .ft button { width: 34px; height: 34px; }
+  .dlg { position: fixed; left: 0; right: 0; bottom: 0; width: 100%; max-height: 88vh; border-radius: 22px 22px 0 0; padding: 20px 18px calc(20px + env(safe-area-inset-bottom)); }
+  .scrim { place-items: end center; padding: 0; }
+  #setup .dlg { position: static; border-radius: 22px; width: min(420px, calc(100% - 32px)); }
+  #setup { place-items: center; }
   .search input, .dlg input, .dlg select, .dlg textarea, .inline-add input, .inline-add select { font-size: 16px; }
 }
 @media (max-width: 380px) { .grid { grid-template-columns: 1fr; } }
+.dots { display: none; }
+@media (max-width: 640px) { .dots { display: flex; } }
+.remember { flex-direction: row !important; align-items: center; gap: 10px !important; font-size: 13px !important; color: var(--ink) !important; cursor: pointer; }
+.remember input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0; }
 </style>
 </head>
 <body>
@@ -341,12 +398,12 @@ body.locked .setup-extra { display: none; }
     <nav class="menu" aria-label="Μενού">
       <button type="button" data-go="home" aria-current="page"><svg class="i"><use href="#i-home"/></svg><span>Αρχική</span></button>
       <button type="button" data-go="projects"><svg class="i"><use href="#i-folder"/></svg><span>Έργα</span></button>
-      <button type="button" data-go="w-focus"><svg class="i"><use href="#i-check-sq"/></svg><span>Εργασίες</span></button>
+      <button type="button" class="m-hide" data-go="w-focus"><svg class="i"><use href="#i-check-sq"/></svg><span>Εργασίες</span></button>
       <button type="button" data-go="w-cal"><svg class="i"><use href="#i-cal"/></svg><span>Ημερολόγιο</span></button>
       <button type="button" data-go="w-habits"><svg class="i"><use href="#i-repeat"/></svg><span>Συνήθειες</span></button>
-      <button type="button" data-go="w-goals"><svg class="i"><use href="#i-target"/></svg><span>Στόχοι</span></button>
-      <button type="button" data-go="w-journal"><svg class="i"><use href="#i-book"/></svg><span>Ημερολόγιο σκέψεων</span></button>
-      <button type="button" data-go="w-notes"><svg class="i"><use href="#i-note"/></svg><span>Σημειώσεις</span></button>
+      <button type="button" class="m-hide" data-go="w-goals"><svg class="i"><use href="#i-target"/></svg><span>Στόχοι</span></button>
+      <button type="button" class="m-hide" data-go="w-journal"><svg class="i"><use href="#i-book"/></svg><span>Ημερολόγιο σκέψεων</span></button>
+      <button type="button" class="m-hide" data-go="w-notes"><svg class="i"><use href="#i-note"/></svg><span>Σημειώσεις</span></button>
       <button type="button" data-go="settings"><svg class="i"><use href="#i-gear"/></svg><span>Ρυθμίσεις</span></button>
     </nav>
     <div class="side-foot">Μικρά βήματα κάθε μέρα φέρνουν μεγάλα αποτελέσματα.<i></i><p class="sync" id="sync" role="status"></p></div>
@@ -356,7 +413,7 @@ body.locked .setup-extra { display: none; }
     <section class="hero">
       <canvas id="hero-cv" aria-hidden="true"></canvas>
       <div class="topbar">
-        <span class="today" id="today"></span>
+        <span class="datebadge" id="today"></span>
         <label class="search"><svg class="i"><use href="#i-search"/></svg><input id="q" type="search" placeholder="Αναζήτηση…" aria-label="Αναζήτηση"></label>
         <button class="ibtn" type="button" id="btn-theme" aria-label="Αλλαγή εικόνας" title="Αλλαγή εικόνας"><svg class="i"><use href="#i-sun"/></svg></button>
         <div class="avatar" title="Φώτης">ΦΧ</div>
@@ -379,6 +436,7 @@ body.locked .setup-extra { display: none; }
             <div class="seg" role="group" aria-label="Προβολή"><button type="button" data-cal="month" aria-pressed="true">Μήνας</button><button type="button" data-cal="week" aria-pressed="false">Εβδομάδα</button></div>
           </div>
           <div class="cal" id="cal"></div>
+          <div class="agenda" id="agenda"></div>
         </section>
 
         <div class="stack">
@@ -451,6 +509,7 @@ body.locked .setup-extra { display: none; }
     <h2 class="setup-extra">Ρυθμίσεις</h2>
     <label for="s-user">Όνομα χρήστη<input id="s-user" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
     <label for="s-token">Κωδικός<input id="s-token" type="password" autocomplete="current-password"></label>
+    <label class="remember" for="s-remember"><input type="checkbox" id="s-remember" checked>Παραμονή σε σύνδεση</label>
     <p class="hint err" id="s-err" role="alert"></p>
     <div class="actions">
       <button type="button" class="danger" id="s-disconnect" hidden>Αποσύνδεση</button>
@@ -551,7 +610,7 @@ function normalize(v) { const d = EMPTY(); if (v && typeof v === "object") for (
 const CFG_KEY = "gd-github", CACHE_KEY = "gd-cache2";
 const DATA_REPO = "dashboard-data", DATA_FILE = "projects.json";
 let cfg = null, sha = null, saveTimer = null, saving = false, dirty = false, loaded = false;
-try { cfg = JSON.parse(localStorage.getItem(CFG_KEY) || "null"); } catch (e) {}
+try { cfg = JSON.parse(localStorage.getItem(CFG_KEY) || sessionStorage.getItem(CFG_KEY) || "null"); } catch (e) {}
 const b64enc = str => { const bytes = new TextEncoder().encode(str); let bin = ""; bytes.forEach(b => bin += String.fromCharCode(b)); return btoa(bin); };
 const b64dec = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, "")), c => c.charCodeAt(0)));
 const api = (path, opts = {}) => fetch(`https://api.github.com/repos/${cfg.user}/${DATA_REPO}/contents/${path}`, {
@@ -562,7 +621,7 @@ function setSync(st) {
   const map = { loading: ["#ffd166", "Συγχρονισμός…"], cloud: ["#3fcf7f", "Συγχρονισμένο"], saving: ["#8fd3ff", "Αποθήκευση…"], error: ["#ff6b7a", "Εκτός σύνδεσης, θα σταλεί αργότερα"] };
   const [c, t] = map[st]; $("#sync").innerHTML = `<i style="background:${c}"></i>${t}`;
 }
-const cacheLocal = () => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {} };
+const cacheLocal = () => { try { if (localStorage.getItem(CFG_KEY)) localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {} };
 async function pull() {
   if (!cfg || saving || dirty) return;
   setSync("loading");
@@ -611,6 +670,7 @@ function start() {
 // ===================== Σύνδεση / Ρυθμίσεις =====================
 function openSetup(first) {
   $("#s-user").value = cfg?.user || ""; $("#s-token").value = ""; $("#s-err").textContent = "";
+  try { $("#s-remember").checked = localStorage.getItem("gd-remember") !== "0"; } catch (e) {}
   $("#s-disconnect").hidden = !cfg; $("#s-close").hidden = first && !cfg;
   $("#setup").classList.add("open");
   setTimeout(() => (cfg ? $("#s-token") : $("#s-user")).focus(), 50);
@@ -623,17 +683,24 @@ $("#setup-form").addEventListener("submit", async e => {
   try {
     const h = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" };
     const me = await fetch("https://api.github.com/user", { cache: "no-store", headers: h });
-    if (me.status === 401) { $("#s-err").textContent = "Ο κωδικός δεν αναγνωρίζεται. Αντέγραψέ τον ξανά ολόκληρο."; return; }
+    if (me.status === 401) { $("#s-err").textContent = "Λάθος όνομα χρήστη ή κωδικός."; return; }
     const r = await fetch(`https://api.github.com/repos/${user}/${DATA_REPO}`, { cache: "no-store", headers: h });
-    if (r.status === 404) { $("#s-err").textContent = `Ο κωδικός δεν βλέπει το «${user}/${DATA_REPO}».`; return; }
+    if (r.status === 404 || r.status === 401 || r.status === 403) { $("#s-err").textContent = "Λάθος όνομα χρήστη ή κωδικός."; return; }
     if (!r.ok) { $("#s-err").textContent = `Σφάλμα (${r.status}).`; return; }
   } catch (err) { $("#s-err").textContent = "Δεν υπάρχει σύνδεση στο internet."; return; }
-  cfg = { user, token }; try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (err) {}
+  cfg = { user, token };
+  try {
+    const keep = $("#s-remember").checked;
+    (keep ? localStorage : sessionStorage).setItem(CFG_KEY, JSON.stringify(cfg));
+    (keep ? sessionStorage : localStorage).removeItem(CFG_KEY);
+    if (!keep) localStorage.removeItem(CACHE_KEY);
+    localStorage.setItem("gd-remember", keep ? "1" : "0");
+  } catch (err) {}
   $("#setup").classList.remove("open"); start();
 });
 $("#s-close").addEventListener("click", () => $("#setup").classList.remove("open"));
 $("#s-disconnect").addEventListener("click", () => {
-  try { localStorage.removeItem(CFG_KEY); localStorage.removeItem(CACHE_KEY); } catch (e) {}
+  try { localStorage.removeItem(CFG_KEY); sessionStorage.removeItem(CFG_KEY); localStorage.removeItem(CACHE_KEY); } catch (e) {}
   cfg = null; sha = null; loaded = false; data = EMPTY(); $("#setup").classList.remove("open"); start();
 });
 
@@ -704,21 +771,37 @@ function renderCal() {
   for (let i = 0; i < days; i++) {
     const d = addDays(start, i), di = iso(d), ev = eventsOn(di);
     const out = calMode === "month" && d.getMonth() !== calRef.getMonth();
-    html += `<button type="button" class="day ${out ? "out" : ""} ${di === todayIso ? "today" : ""}" data-day="${di}" aria-label="${d.getDate()} ${MONTHS[d.getMonth()]}, ${ev.length} γεγονότα"><span class="n">${d.getDate()}</span>` +
+    html += `<button type="button" class="day ${out ? "out" : ""} ${di === todayIso ? "today" : ""} ${di === selDay ? "sel" : ""}" data-day="${di}" aria-label="${d.getDate()} ${MONTHS[d.getMonth()]}, ${ev.length} γεγονότα"><span class="n">${d.getDate()}</span>` +
       ev.slice(0, cap).map(e => `<span class="ev ${e.done ? "done" : ""}" style="--c:${e.c}"><b>${esc(e.title)}</b><small>${e.sub}</small></span>`).join("") +
-      (ev.length > cap ? `<span class="more">+${ev.length - cap} ακόμη</span>` : "") + `</button>`;
+      (ev.length > cap ? `<span class="more">+${ev.length - cap} ακόμη</span>` : "") +
+      `<span class="dots">${ev.slice(0, 4).map(e => `<i style="--c:${e.c}"></i>`).join("")}</span></button>`;
   }
   const c = $("#cal"); c.innerHTML = html; c.classList.toggle("week", calMode === "week");
   document.querySelectorAll("[data-cal]").forEach(b => b.setAttribute("aria-pressed", b.dataset.cal === calMode));
+  renderAgenda();
+}
+let selDay = todayIso;
+const isPhone = () => matchMedia("(max-width: 640px)").matches;
+function renderAgenda() {
+  const ev = eventsOn(selDay);
+  const d = parse(selDay);
+  $("#agenda").innerHTML = `<h3>${selDay === todayIso ? "Σήμερα" : d.toLocaleDateString("el-GR", { weekday: "long", day: "numeric", month: "long" })}</h3>` +
+    (ev.length ? ev.map(e => `<div class="row"><span class="bar-c" style="--c:${e.c}"></span><span class="grow ${e.done ? "t" : ""}" style="${e.done ? "text-decoration:line-through;color:var(--ink-3)" : ""}">${esc(e.title)}</span><span class="tag" style="--c:${e.c}">${e.sub}</span></div>`).join("") : `<p class="empty">Τίποτα προγραμματισμένο.</p>`) +
+    `<button class="add" type="button" id="agenda-add"><svg class="i"><use href="#i-plus"/></svg>Εργασία για αυτή τη μέρα</button>`;
+  $("#agenda-add").onclick = () => taskForDay(selDay);
+}
+function taskForDay(day) {
+  openModal({ title: `Εργασία για ${fmtShort(day)}`, fields: [
+    { key: "title", label: "Τίτλος", required: true }, { key: "tag", label: "Κατηγορία", type: "select", options: catOptions }, { key: "date", label: "Ημερομηνία", type: "date" } ],
+    values: { date: day }, onSave: v => { if (!v.title) return; data.tasks.push({ id: uid(), title: v.title, tag: v.tag, date: v.date || day, done: false }); save(); } });
 }
 $("#cal-prev").onclick = () => { calMode === "month" ? calRef.setMonth(calRef.getMonth() - 1, 1) : calRef.setDate(calRef.getDate() - 7); renderCal(); };
 $("#cal-next").onclick = () => { calMode === "month" ? calRef.setMonth(calRef.getMonth() + 1, 1) : calRef.setDate(calRef.getDate() + 7); renderCal(); };
 document.querySelectorAll("[data-cal]").forEach(b => b.onclick = () => { calMode = b.dataset.cal; calRef = new Date(TODAY); renderCal(); });
 $("#cal").addEventListener("click", e => {
   const d = e.target.closest("[data-day]"); if (!d) return;
-  openModal({ title: `Εργασία για ${fmtShort(d.dataset.day)}`, fields: [
-    { key: "title", label: "Τίτλος", required: true }, { key: "tag", label: "Κατηγορία", type: "select", options: catOptions }, { key: "date", label: "Ημερομηνία", type: "date" } ],
-    values: { date: d.dataset.day }, onSave: v => { if (!v.title) return; data.tasks.push({ id: uid(), title: v.title, tag: v.tag, date: v.date || d.dataset.day, done: false }); save(); } });
+  if (isPhone()) { selDay = d.dataset.day; renderCal(); return; }
+  taskForDay(d.dataset.day);
 });
 
 function taskRow(t) {
