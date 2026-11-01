@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1b2550">
+<meta name="theme-color" content="#0a0c18">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,329 +11,580 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<title>Glass Dashboard</title>
+<title>Life Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
 <style>
-/* Layout: painted landscape behind floor-to-ceiling windows; frosted top pill nav, floating left icon rail, one big glass board of coloured project cards */
+/* Layout: dark planner. Fixed sidebar left; main = painted hero, 4 stat tiles, then a 3-column board of widgets (calendar spans two). */
 :root {
-  --ink: #ffffff;
-  --ink-2: rgba(255,255,255,.72);
-  --ink-3: rgba(255,255,255,.5);
-  --glass: rgba(22,18,44,.26);
-  --glass-2: rgba(255,255,255,.14);
-  --edge: rgba(255,255,255,.22);
-  --accent: #3d8bff;
-  --own: #5b8def;      /* Η εταιρία μου */
-  --partner: #d9a441;  /* Συνεργαζόμενη εταιρία */
-  --home: #4fbf7f;     /* Hobbies & Σπίτι */
+  --bg: #090b16;
+  --panel: rgba(22, 24, 44, .72);
+  --panel-2: rgba(255,255,255,.04);
+  --line: rgba(255,255,255,.08);
+  --ink: #eef0fb;
+  --ink-2: #a9aecb;
+  --ink-3: #6f7596;
+  --accent: #6d5dfc;
+  --accent-2: #8f83ff;
+  --own: #5b8def;
+  --partner: #e0a440;
+  --home: #3fbf7f;
+  --ok: #3fcf7f;
+  --warn: #ffb547;
+  --bad: #ff6b7a;
   --font: "Commissioner", "Segoe UI", system-ui, sans-serif;
+  --hand: "Caveat", "Segoe Script", cursive;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; }
-body { background: #1b2550; color: var(--ink); font-family: var(--font); font-size: 14px; line-height: 1.4; overflow-x: hidden; }
-#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
-.bgimg { position: fixed; inset: 0; z-index: 0; background-size: cover; background-position: center; }
-
-.glass {
-  background: var(--glass);
-  border: 1px solid var(--edge);
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-  box-shadow: 0 12px 40px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.18);
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--bg);
+  background-image: radial-gradient(1200px 600px at 85% -10%, rgba(109,93,252,.16), transparent 60%), radial-gradient(900px 700px at -10% 110%, rgba(63,191,127,.08), transparent 60%);
+  background-attachment: fixed;
+  color: var(--ink); font-family: var(--font); font-size: 14px; line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
 }
 button { font: inherit; color: inherit; }
-button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-svg.i { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+input, select, textarea { font: inherit; color: var(--ink); }
+:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+svg.i { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-/* Top bar */
-.top { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(14px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right)) 14px calc(18px + env(safe-area-inset-left)); }
-.ibtn { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; position: relative; }
-.ibtn:hover { background: rgba(255,255,255,.22); }
-.group { display: flex; gap: 8px; align-items: center; }
-.nav { display: flex; gap: 6px; padding: 5px; border-radius: 999px; }
-.nav button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 999px; border: 0; background: transparent; cursor: pointer; color: var(--ink-2); font-weight: 500; }
-.nav button:hover { color: #fff; background: rgba(255,255,255,.1); }
-.nav button[aria-current="page"] { background: rgba(255,255,255,.2); color: #fff; }
-.badge { position: absolute; top: 4px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: #ff5a5f; border: 1.5px solid rgba(0,0,0,.3); }
-.avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f0a35e, #d2693c); display: grid; place-items: center; font-weight: 700; font-size: 13px; border: 2px solid rgba(255,255,255,.5); }
-@media (max-width: 820px) { .nav .lbl { display: none; } .top .hide-sm { display: none; } }
+.app { display: grid; grid-template-columns: 228px 1fr; min-height: 100vh; }
 
-/* Shell */
-.shell { position: relative; z-index: 1; display: grid; grid-template-columns: 56px 1fr; gap: 16px; padding: 4px 18px 28px; max-width: 1480px; margin: 0 auto; }
-.rail { z-index: 3; align-self: center; position: sticky; top: 30vh; display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 999px; }
-.rail button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--ink-2); position: relative; }
-.rail button:hover { background: rgba(255,255,255,.14); color: #fff; }
-.rail button[aria-pressed="true"] { background: #fff; color: #2a2420; }
-.rail button .tip { position: absolute; left: 50px; white-space: nowrap; font-size: 12px; padding: 4px 9px; border-radius: 8px; background: rgba(20,18,16,.75); color: #fff; opacity: 0; pointer-events: none; transition: opacity .15s; }
-.rail button:hover .tip, .rail button:focus-visible .tip { opacity: 1; }
-@media (max-width: 700px) { .shell { grid-template-columns: 1fr; } .rail { position: static; flex-direction: row; justify-content: center; border-radius: 999px; align-self: stretch; } .rail button .tip { display: none; } }
+/* Sidebar */
+aside.side {
+  position: sticky; top: 0; height: 100vh; padding: calc(22px + env(safe-area-inset-top)) 14px 22px calc(14px + env(safe-area-inset-left));
+  display: flex; flex-direction: column; gap: 22px;
+  border-right: 1px solid var(--line); background: rgba(10,12,24,.6); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+}
+.brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
+.brand img { width: 40px; height: 40px; border-radius: 11px; }
+.brand b { display: block; font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+.brand small { color: var(--ink-3); font-size: 11.5px; letter-spacing: .02em; }
+nav.menu { display: flex; flex-direction: column; gap: 3px; }
+nav.menu button {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; border: 0; background: transparent;
+  color: var(--ink-2); cursor: pointer; text-align: left; font-weight: 500;
+}
+nav.menu button:hover { background: rgba(255,255,255,.05); color: var(--ink); }
+nav.menu button[aria-current="page"] { background: linear-gradient(90deg, rgba(109,93,252,.35), rgba(109,93,252,.12)); color: #fff; box-shadow: inset 0 0 0 1px rgba(143,131,255,.35); }
+.side-foot { margin-top: auto; padding: 0 8px; color: var(--ink-3); font-size: 12.5px; }
+.side-foot i { display: block; width: 26px; height: 2px; background: var(--accent); margin-top: 10px; border-radius: 2px; }
 
-.board { background: rgba(255,255,255,.06); backdrop-filter: blur(8px) saturate(140%); -webkit-backdrop-filter: blur(8px) saturate(140%); border-radius: 28px; padding: 22px 22px 26px; min-width: 0; }
-.board-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
-.board-head h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.01em; }
-.board-head p { margin: 2px 0 0; color: var(--ink-2); font-size: 13px; }
-.sync { display: inline-flex; align-items: center; gap: 6px; font-size: 11px !important; color: var(--ink-3) !important; margin-top: 4px !important; }
-.sync i { width: 7px; height: 7px; border-radius: 50%; }
-.tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.seg { display: flex; gap: 3px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.12); border: 1px solid var(--edge); flex-wrap: wrap; }
-.seg button { border: 0; background: transparent; padding: 7px 13px; border-radius: 999px; cursor: pointer; color: var(--ink-2); font-size: 13px; font-weight: 500; display: inline-flex; gap: 7px; align-items: center; }
-.seg button:hover { color: #fff; }
-.seg button[aria-pressed="true"] { background: #fff; color: #2a2420; }
-.seg .dot { width: 8px; height: 8px; border-radius: 50%; }
-.primary { border: 0; background: var(--accent); color: #fff; padding: 9px 16px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; font-weight: 600; font-size: 13px; box-shadow: 0 6px 18px rgba(61,139,255,.4); }
-.primary:hover { filter: brightness(1.08); }
+main { min-width: 0; padding: calc(18px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(30px + env(safe-area-inset-bottom)) 20px; display: flex; flex-direction: column; gap: 16px; }
 
-.subbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 14px 0 18px; }
-.search { display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.1); border: 1px solid var(--edge); color: var(--ink-2); }
-.search input { border: 0; background: transparent; color: #fff; font: inherit; padding: 8px 0; width: 190px; outline: none; }
+/* Hero */
+.hero { position: relative; height: 236px; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,7,16,.72) 0%, rgba(6,7,16,.25) 45%, rgba(6,7,16,0) 70%); pointer-events: none; }
+.hero-text { position: absolute; left: 30px; bottom: 34px; z-index: 1; }
+.hero h1 { margin: 0; font-size: 40px; font-weight: 800; letter-spacing: -.02em; text-wrap: balance; }
+.hero p { margin: 6px 0 0; color: rgba(255,255,255,.82); font-size: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+.hero p span + span::before { content: "·"; margin-right: 10px; opacity: .6; }
+.motto { position: absolute; right: 34px; bottom: 30px; z-index: 1; font-family: var(--hand); font-size: 30px; line-height: 1.05; color: #fff; transform: rotate(-8deg); text-align: right; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+.motto i { display: block; height: 2px; width: 70%; margin: 8px 0 0 auto; background: var(--accent-2); border-radius: 2px; }
+.topbar { position: absolute; top: 14px; right: 14px; z-index: 2; display: flex; gap: 10px; align-items: center; }
+.today { font-size: 12px; color: rgba(255,255,255,.85); margin-right: 4px; }
+.search { display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 36px; border-radius: 10px; background: rgba(8,9,20,.6); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--ink-2); }
+.search input { border: 0; background: transparent; outline: none; width: 160px; color: #fff; }
 .search input::placeholder { color: var(--ink-3); }
-.mini { border: 1px solid var(--edge); background: rgba(255,255,255,.08); padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer; color: var(--ink-2); }
-.mini[aria-pressed="true"] { background: rgba(255,255,255,.85); color: #2a2420; border-color: transparent; }
-.stats { margin-left: auto; display: flex; gap: 16px; color: var(--ink-2); font-size: 12px; font-variant-numeric: tabular-nums; }
-.stats b { color: #fff; font-size: 15px; margin-right: 4px; }
+.ibtn { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,.12); background: rgba(8,9,20,.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.ibtn:hover { background: rgba(255,255,255,.12); }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: linear-gradient(135deg, #f0a35e, #d2693c); border: 2px solid rgba(255,255,255,.6); }
 
-/* Cards */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(208px, 1fr)); gap: 16px; }
-.card {
-  --c: var(--own);
-  border-radius: 20px; padding: 8px; display: flex; flex-direction: column; gap: 10px; text-align: left;
-  background: rgba(20,16,40,.30); border: 1px solid var(--edge);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 10px 30px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.14);
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.2); }
-@media (prefers-reduced-motion: reduce) { .card, .card:hover { transition: none; transform: none; } }
-.card .hero {
-  height: 96px; border-radius: 14px; position: relative; padding: 12px;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--c) 92%, #fff 8%), color-mix(in srgb, var(--c) 70%, #000 30%));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
-}
-.card .hero svg.i { width: 20px; height: 20px; opacity: .92; }
-.card .tag { position: absolute; right: 10px; bottom: 10px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,.28); }
-.card .st { position: absolute; right: 10px; top: 10px; font-size: 11px; padding: 3px 8px; border-radius: 999px; background: rgba(0,0,0,.22); display: inline-flex; gap: 5px; align-items: center; }
-.card .st i { width: 6px; height: 6px; border-radius: 50%; }
-.card .body { padding: 0 6px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
-.card h3 { margin: 0; font-size: 14px; font-weight: 600; text-wrap: balance; }
+/* Panels */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; min-width: 0; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.ph { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ph h2 { margin: 0; font-size: 15px; font-weight: 700; flex: 1; display: flex; align-items: center; gap: 10px; }
+.ph h2 svg { color: var(--ink-2); }
+.link { border: 0; background: none; color: var(--ink-2); font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; border-radius: 6px; }
+.link:hover { color: #fff; background: rgba(255,255,255,.06); }
+.add { border: 0; background: none; color: var(--ink-3); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 8px 4px 2px; }
+.add:hover { color: var(--ink); }
+.empty { color: var(--ink-3); font-size: 13px; padding: 6px 0; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.stat { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: start; padding: 16px; }
+.stat .ico { grid-row: 1 / span 3; width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; color: #fff; }
+.stat .lbl { color: var(--ink-2); font-size: 13px; }
+.stat .val { font-size: 26px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; grid-column: 2; }
+.stat .sub { grid-column: 2 / span 2; font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.stat .sub.up { color: var(--ok); }
+.stat .sub.down { color: var(--bad); }
+.stat .bar { grid-column: 2 / span 2; height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 4px; }
+.stat .bar span { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+/* Board */
+.board { display: grid; grid-template-columns: 1fr 1fr .92fr; gap: 14px; grid-template-areas:
+  "cal cal side"
+  "habits goals motiv"
+  "habits goals week"
+  "journal quote week"; align-items: start; }
+#w-cal { grid-area: cal; align-self: stretch; } .stack { grid-area: side; display: flex; flex-direction: column; gap: 14px; }
+#w-habits { grid-area: habits; align-self: stretch; } #w-goals { grid-area: goals; align-self: stretch; } #w-motiv { grid-area: motiv; }
+#w-week { grid-area: week; align-self: stretch; } #w-journal { grid-area: journal; align-self: stretch; } #w-quote { grid-area: quote; align-self: stretch; }
+
+/* Calendar */
+.seg { display: flex; padding: 3px; border-radius: 9px; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+.seg button { border: 0; background: transparent; padding: 5px 12px; border-radius: 7px; cursor: pointer; color: var(--ink-2); font-size: 12.5px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.cal-nav { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--ink-2); }
+.cal-nav b { font-weight: 600; color: var(--ink); min-width: 120px; text-align: center; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.cal .dow { padding: 8px 0; text-align: center; font-size: 12px; color: var(--ink-2); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(255,255,255,.02); }
+.day { min-height: 84px; padding: 6px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; cursor: pointer; background: transparent; text-align: left; border-top: 0; border-left: 0; }
+.day:hover { background: rgba(255,255,255,.03); }
+.day.out { opacity: .38; }
+.day .n { font-size: 12px; color: var(--ink-2); width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; }
+.day.today .n { background: var(--accent); color: #fff; font-weight: 700; }
+.day.today { background: rgba(109,93,252,.08); }
+.week .day { min-height: 220px; }
+.ev { font-size: 11px; line-height: 1.25; padding: 4px 6px; border-radius: 6px; border-left: 3px solid var(--c); background: color-mix(in srgb, var(--c) 22%, transparent); overflow: hidden; }
+.ev b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev small { color: var(--ink-2); font-size: 10.5px; }
+.ev.done b { text-decoration: line-through; opacity: .6; }
+.more { font-size: 10.5px; color: var(--ink-3); padding-left: 4px; }
+
+/* Lists */
+.list { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: 0; }
+.row .grow { flex: 1; min-width: 0; }
+.check { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--ink-3); background: transparent; display: grid; place-items: center; cursor: pointer; flex: none; padding: 0; }
+.check[aria-checked="true"] { background: var(--accent); border-color: var(--accent); }
+.check[aria-checked="true"]::after { content: ""; width: 9px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px, -1px); }
+.row.done .t { text-decoration: line-through; color: var(--ink-3); }
+.tag { font-size: 11px; padding: 3px 9px; border-radius: 6px; white-space: nowrap; background: color-mix(in srgb, var(--c) 26%, transparent); color: color-mix(in srgb, var(--c) 70%, #fff); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); }
+.x { opacity: 0; border: 0; background: none; color: var(--ink-3); cursor: pointer; padding: 2px; border-radius: 5px; display: grid; place-items: center; }
+.row:hover .x, .x:focus-visible { opacity: 1; }
+.x:hover { color: var(--bad); }
+@media (hover: none) { .x { opacity: .6; } }
+.inline-add { display: flex; gap: 8px; margin-top: 8px; }
+.inline-add input, .inline-add select { background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-width: 0; }
+.inline-add input { flex: 1; }
+.notes li { margin: 0 0 6px; }
+.notes ul { margin: 0; padding-left: 18px; }
+.notes .row { padding: 6px 0; border: 0; }
+.notes .row::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-2); flex: none; }
+
+/* Habits */
+.habits { width: 100%; border-collapse: collapse; font-size: 13px; }
+.habits th { font-weight: 500; color: var(--ink-2); font-size: 12px; padding: 4px 2px 10px; text-align: center; }
+.habits th:first-child { text-align: left; }
+.habits td { padding: 7px 2px; text-align: center; border-top: 1px solid var(--line); }
+.habits td:first-child { text-align: left; }
+.hname { display: flex; align-items: center; gap: 10px; }
+.hico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 30%, transparent); color: color-mix(in srgb, var(--c) 60%, #fff); flex: none; }
+.hico svg { width: 16px; height: 16px; }
+.dot { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--ink-3); background: transparent; cursor: pointer; padding: 0; display: inline-grid; place-items: center; }
+.dot[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); }
+.dot[aria-pressed="true"]::after { content: ""; width: 8px; height: 4px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px, -1px); }
+.dot.today { box-shadow: 0 0 0 2px rgba(143,131,255,.5); }
+.dot.future { opacity: .35; }
+
+/* Goals */
+.goal { display: grid; grid-template-columns: 40px 1fr auto; gap: 4px 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; border-radius: 8px; }
+.goal:last-child { border-bottom: 0; }
+.goal:hover { background: rgba(255,255,255,.02); }
+.goal .gi { grid-row: 1 / span 3; width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--c); color: #fff; }
+.goal b { font-size: 13.5px; font-weight: 600; }
+.goal small { grid-column: 2; color: var(--ink-3); font-size: 12px; margin-top: -2px; }
+.goal .pct { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.goal .gb { grid-column: 2; height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+.goal .gb span { display: block; height: 100%; border-radius: 3px; background: var(--c); }
+.goal .gd { font-size: 11px; color: var(--ink-3); }
+
+/* Motivation + quote */
+.motiv { position: relative; height: 150px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.motiv canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.motiv p { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); margin: 0; font-size: 16px; font-weight: 600; max-width: 62%; line-height: 1.35; text-shadow: 0 1px 10px rgba(0,0,0,.5); }
+.motiv p::after { content: ""; display: block; width: 40px; height: 2px; background: var(--accent-2); margin-top: 12px; border-radius: 2px; }
+.quote { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 12px; min-height: 200px; background: radial-gradient(120% 90% at 100% 100%, rgba(63,191,127,.28), transparent 60%), var(--panel); cursor: pointer; }
+.quote .mark { font-size: 46px; line-height: .6; color: var(--ink-2); font-family: Georgia, serif; }
+.quote blockquote { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; max-width: 30ch; text-wrap: balance; }
+.quote cite { color: var(--ink-2); font-style: normal; font-size: 12.5px; }
+.quote svg.leaf { position: absolute; right: -10px; bottom: -14px; width: 130px; height: 130px; color: rgba(63,191,127,.35); stroke-width: 1; }
+
+/* Week goals rings */
+.ring { width: 38px; height: 38px; flex: none; }
+.ring circle { fill: none; stroke-width: 4; }
+.ring text { font-size: 10px; font-weight: 700; fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+.btn-soft { border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 12.5px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; }
+.btn-soft:hover { color: #fff; background: rgba(255,255,255,.08); }
+
+/* Journal */
+.jr { display: grid; grid-template-columns: 74px 44px 1fr; gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.jr:last-child { border-bottom: 0; }
+.jr time { color: var(--ink-3); font-size: 12px; }
+.jr .thumb { width: 44px; height: 36px; border-radius: 8px; }
+.jr b { display: block; font-size: 13.5px; font-weight: 600; }
+.jr span { display: block; color: var(--ink-2); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Projects view */
+.pv-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.pv-head h1 { margin: 0; font-size: 26px; font-weight: 800; flex: 1; }
+.pills { display: flex; gap: 4px; padding: 4px; border-radius: 11px; background: rgba(255,255,255,.04); border: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.pills button { border: 0; background: transparent; padding: 7px 12px; border-radius: 8px; cursor: pointer; color: var(--ink-2); white-space: nowrap; display: inline-flex; gap: 7px; align-items: center; font-size: 13px; }
+.pills button[aria-pressed="true"] { background: rgba(255,255,255,.12); color: #fff; }
+.pills i { width: 8px; height: 8px; border-radius: 50%; }
+.primary { border: 0; background: var(--accent); color: #fff; padding: 9px 16px; border-radius: 10px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; font-weight: 600; font-size: 13px; box-shadow: 0 6px 20px rgba(109,93,252,.35); }
+.primary:hover { filter: brightness(1.1); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 8px; display: flex; flex-direction: column; gap: 10px; transition: transform .18s, border-color .18s; cursor: pointer; }
+.card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.18); }
+.card .hd { height: 84px; border-radius: 11px; position: relative; padding: 12px; background: linear-gradient(150deg, color-mix(in srgb, var(--c) 90%, #fff 10%), color-mix(in srgb, var(--c) 55%, #000 45%)); }
+.card .hd .st { position: absolute; right: 10px; top: 10px; font-size: 11px; padding: 3px 8px; border-radius: 999px; background: rgba(0,0,0,.28); display: inline-flex; gap: 5px; align-items: center; }
+.card .hd .st i { width: 6px; height: 6px; border-radius: 50%; }
+.card .hd .ct { position: absolute; right: 10px; bottom: 10px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,.25); }
+.card .bd { padding: 0 6px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.card h3 { margin: 0; font-size: 14px; font-weight: 600; }
 .card p { margin: 0; font-size: 12px; color: var(--ink-2); }
-.prog { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 11px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.prog .track { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.15); overflow: hidden; }
-.prog .track span { display: block; height: 100%; background: var(--c); border-radius: 2px; }
-.card .foot { display: flex; align-items: center; gap: 4px; padding: 4px 6px 2px; font-size: 11px; color: var(--ink-3); border-top: 1px solid rgba(255,255,255,.1); padding-top: 8px; }
-.card .foot .meta { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card .foot button { border: 0; background: transparent; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; cursor: pointer; color: var(--ink-2); }
-.card .foot button:hover { background: rgba(255,255,255,.14); color: #fff; }
-.card .foot button[aria-pressed="true"] { color: #ffd166; }
-.card .foot button[aria-pressed="true"] svg { fill: currentColor; }
-.card .due-late { color: #ff9a9a; }
-.empty { grid-column: 1 / -1; padding: 40px 10px; text-align: center; color: var(--ink-2); }
+.card .pg { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--ink-2); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.card .pg div { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.1); overflow: hidden; }
+.card .pg span { display: block; height: 100%; background: var(--c); }
+.card .ft { display: flex; align-items: center; gap: 4px; padding: 8px 6px 2px; font-size: 11px; color: var(--ink-3); border-top: 1px solid var(--line); }
+.card .ft .late { color: var(--bad); }
+.card .ft span { flex: 1; }
+.card .ft button { border: 0; background: none; width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; cursor: pointer; color: var(--ink-2); }
+.card .ft button:hover { background: rgba(255,255,255,.08); color: #fff; }
+.card .ft button[aria-pressed="true"] { color: var(--warn); }
+.card .ft button[aria-pressed="true"] svg { fill: currentColor; }
+.card .ft svg { width: 15px; height: 15px; }
 
-/* Dialog */
-.scrim { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.35); display: none; place-items: center; padding: 16px; }
+.view[hidden] { display: none !important; }
+
+/* Modal */
+.scrim { position: fixed; inset: 0; z-index: 20; background: rgba(3,4,10,.6); display: none; place-items: center; padding: 16px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 .scrim.open { display: grid; }
-.dlg { width: min(440px, 100%); border-radius: 24px; padding: 22px; display: flex; flex-direction: column; gap: 12px; background: rgba(22,18,44,.55); }
+.dlg { width: min(460px, 100%); max-height: calc(100vh - 32px); overflow: auto; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 12px; background: #151830; border: 1px solid rgba(255,255,255,.1); box-shadow: 0 30px 80px rgba(0,0,0,.5); }
 .dlg h2 { margin: 0 0 4px; font-size: 18px; }
 .dlg label { font-size: 12px; color: var(--ink-2); display: flex; flex-direction: column; gap: 5px; }
-.dlg input, .dlg select { font: inherit; color: #fff; background: rgba(255,255,255,.1); border: 1px solid var(--edge); border-radius: 12px; padding: 9px 11px; }
-.dlg select option { background: #3a332e; }
-.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
-.ghost { border: 1px solid var(--edge); background: transparent; padding: 9px 16px; border-radius: 999px; cursor: pointer; }
-body.locked header, body.locked .shell { display: none !important; }
-body.locked #setup { background: transparent; }
-.login-brand { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 4px; text-align: center; }
-.login-brand img { width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.dlg input, .dlg select, .dlg textarea { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 9px 11px; }
+.dlg textarea { min-height: 120px; resize: vertical; }
+.dlg select option { background: #151830; }
+.dlg input[type=range] { padding: 0; accent-color: var(--accent); }
+.dlg .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dlg .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+.ghost { border: 1px solid rgba(255,255,255,.14); background: transparent; padding: 9px 16px; border-radius: 10px; cursor: pointer; }
+.danger { margin-right: auto; border: 0; background: none; color: var(--bad); cursor: pointer; padding: 9px 4px; }
+.hint { margin: 0; font-size: 13px; color: var(--ink-2); }
+.err { color: #ffb0b8; min-height: 1em; }
+.toast { position: fixed; bottom: calc(18px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 30; padding: 10px 16px; border-radius: 10px; font-size: 13px; background: #1d2140; border: 1px solid rgba(255,255,255,.12); opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.sync { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-3); }
+.sync i { width: 7px; height: 7px; border-radius: 50%; }
+
+/* Login */
+body.locked .app { display: none; }
+#login-bg { position: fixed; inset: 0; width: 100%; height: 100%; display: none; }
+body.locked #login-bg { display: block; }
+body.locked #setup { background: rgba(3,4,10,.25); }
+.login-brand { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.login-brand img { width: 64px; height: 64px; border-radius: 16px; }
 body:not(.locked) .login-brand { display: none; }
 body.locked .setup-extra { display: none; }
-.hint { margin: 0; font-size: 13px; color: var(--ink-2); }
-.hint.err { color: #ffb0b0; min-height: 1em; }
-.toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 11; padding: 9px 16px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; }
-.toast.show { opacity: 1; }
-@media (max-width: 560px) { .top { padding: calc(10px + env(safe-area-inset-top)) 12px 10px; } .shell { padding: 4px 10px calc(20px + env(safe-area-inset-bottom)); } .board { padding: 16px 14px 18px; border-radius: 22px; } .board-head h1 { font-size: 22px; } .tools, .seg { width: 100%; } .seg { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } .seg button { flex: none; white-space: nowrap; } .primary { width: 100%; justify-content: center; } .search { flex: 1 1 100%; } .search input { width: 100%; } .stats { margin-left: 0; } .grid { grid-template-columns: 1fr 1fr; gap: 10px; } .card .hero { height: 72px; } }
-@media (max-width: 560px) { .search input, .dlg input, .dlg select { font-size: 16px; } }
+
+@media (prefers-reduced-motion: reduce) { .card, .card:hover { transition: none; transform: none; } }
+
+@media (max-width: 1180px) {
+  .board { grid-template-columns: 1fr 1fr; grid-template-areas: "cal cal" "side side" "habits goals" "motiv week" "journal quote"; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stack { display: grid; grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; }
+  aside.side { position: sticky; top: 0; z-index: 10; height: auto; flex-direction: row; align-items: center; padding: calc(10px + env(safe-area-inset-top)) 12px 10px; gap: 10px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .brand b, .brand small, .side-foot { display: none; }
+  .brand { padding: 0; }
+  .brand img { width: 34px; height: 34px; }
+  nav.menu { flex-direction: row; overflow-x: auto; scrollbar-width: none; gap: 2px; }
+  nav.menu button { padding: 8px 10px; white-space: nowrap; }
+  nav.menu button span { display: none; }
+  nav.menu button[aria-current="page"] span { display: inline; }
+  main { padding: 14px 12px calc(24px + env(safe-area-inset-bottom)); }
+  .hero { height: 210px; }
+  .hero h1 { font-size: 30px; }
+  .hero-text { left: 18px; bottom: 22px; }
+  .motto { display: none; }
+  .search, .today { display: none; }
+  .day { min-height: 64px; padding: 4px; }
+  .ev small { display: none; }
+}
+@media (max-width: 640px) {
+  .board { grid-template-columns: 1fr; grid-template-areas: "side" "cal" "habits" "goals" "week" "motiv" "journal" "quote"; }
+  .stack { grid-template-columns: 1fr; }
+  .ph { flex-wrap: wrap; }
+  .cal-nav b { min-width: 0; }
+  .stats { gap: 10px; }
+  .stat { padding: 12px; grid-template-columns: auto 1fr; }
+  .stat .ico { width: 34px; height: 34px; }
+  .stat .val { font-size: 22px; }
+  .stat .corner { display: none; }
+  .ev { padding: 2px 3px; font-size: 9.5px; border-left-width: 2px; }
+  .cal .dow { font-size: 10.5px; }
+  .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .search input, .dlg input, .dlg select, .dlg textarea, .inline-add input, .inline-add select { font-size: 16px; }
+}
 @media (max-width: 380px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-<canvas id="bg" aria-hidden="true"></canvas>
-<div class="bgimg" id="bgimg" aria-hidden="true"></div>
+<canvas id="login-bg" aria-hidden="true"></canvas>
 
-<header class="top">
-  <div class="group">
-    <button class="ibtn glass hide-sm" type="button" id="btn-filters" aria-label="Φίλτρα"><svg class="i"><use href="#i-sliders"/></svg></button>
-    <button class="ibtn glass" type="button" id="btn-bg" aria-label="Αλλαγή φόντου" title="Αλλαγή φόντου"><svg class="i"><use href="#i-image"/></svg></button>
-    <input type="file" id="bgfile" accept="image/*" hidden>
-  </div>
-  <nav class="nav glass" aria-label="Κύριο μενού">
-    <button type="button" data-view="home"><svg class="i"><use href="#i-home"/></svg><span class="lbl">Αρχική</span></button>
-    <button type="button" data-view="projects" aria-current="page"><svg class="i"><use href="#i-folder"/></svg><span class="lbl">Έργα</span></button>
-    <button type="button" data-view="goals"><svg class="i"><use href="#i-target"/></svg><span class="lbl">Στόχοι</span></button>
-    <button type="button" data-view="settings"><svg class="i"><use href="#i-gear"/></svg><span class="lbl">Ρυθμίσεις</span></button>
-  </nav>
-  <div class="group">
-    <button class="ibtn glass hide-sm" type="button" aria-label="Μηνύματα"><svg class="i"><use href="#i-mail"/></svg></button>
-    <button class="ibtn glass" type="button" aria-label="Ειδοποιήσεις"><svg class="i"><use href="#i-bell"/></svg><span class="badge"></span></button>
-    <div class="avatar" title="Φώτης">ΦΧ</div>
-  </div>
-</header>
-
-<div class="shell">
-  <aside class="rail glass" aria-label="Γρήγορες προβολές">
-    <button type="button" data-quick="all" aria-pressed="true"><svg class="i"><use href="#i-grid"/></svg><span class="tip">Όλα τα έργα</span></button>
-    <button type="button" data-quick="today"><svg class="i"><use href="#i-clock"/></svg><span class="tip">Λήγουν σύντομα</span></button>
-    <button type="button" data-quick="late"><svg class="i"><use href="#i-alert"/></svg><span class="tip">Καθυστερημένα</span></button>
-    <button type="button" data-quick="done"><svg class="i"><use href="#i-check"/></svg><span class="tip">Ολοκληρωμένα</span></button>
-    <button type="button" data-quick="fav"><svg class="i"><use href="#i-heart"/></svg><span class="tip">Αγαπημένα</span></button>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><img src="icon-180.png" alt=""><div><b>Life Dashboard</b><small>Σχέδιο · Εστίαση · Πρόοδος</small></div></div>
+    <nav class="menu" aria-label="Μενού">
+      <button type="button" data-go="home" aria-current="page"><svg class="i"><use href="#i-home"/></svg><span>Αρχική</span></button>
+      <button type="button" data-go="projects"><svg class="i"><use href="#i-folder"/></svg><span>Έργα</span></button>
+      <button type="button" data-go="w-focus"><svg class="i"><use href="#i-check-sq"/></svg><span>Εργασίες</span></button>
+      <button type="button" data-go="w-cal"><svg class="i"><use href="#i-cal"/></svg><span>Ημερολόγιο</span></button>
+      <button type="button" data-go="w-habits"><svg class="i"><use href="#i-repeat"/></svg><span>Συνήθειες</span></button>
+      <button type="button" data-go="w-goals"><svg class="i"><use href="#i-target"/></svg><span>Στόχοι</span></button>
+      <button type="button" data-go="w-journal"><svg class="i"><use href="#i-book"/></svg><span>Ημερολόγιο σκέψεων</span></button>
+      <button type="button" data-go="w-notes"><svg class="i"><use href="#i-note"/></svg><span>Σημειώσεις</span></button>
+      <button type="button" data-go="settings"><svg class="i"><use href="#i-gear"/></svg><span>Ρυθμίσεις</span></button>
+    </nav>
+    <div class="side-foot">Μικρά βήματα κάθε μέρα φέρνουν μεγάλα αποτελέσματα.<i></i><p class="sync" id="sync" role="status"></p></div>
   </aside>
 
-  <main class="board glass">
-    <div class="board-head">
-      <div>
-        <h1 id="title">Τα έργα μου</h1>
-        <p id="subtitle"></p>
-        <p class="sync" id="sync" role="status"></p>
+  <main>
+    <section class="hero">
+      <canvas id="hero-cv" aria-hidden="true"></canvas>
+      <div class="topbar">
+        <span class="today" id="today"></span>
+        <label class="search"><svg class="i"><use href="#i-search"/></svg><input id="q" type="search" placeholder="Αναζήτηση…" aria-label="Αναζήτηση"></label>
+        <button class="ibtn" type="button" id="btn-theme" aria-label="Αλλαγή εικόνας" title="Αλλαγή εικόνας"><svg class="i"><use href="#i-sun"/></svg></button>
+        <div class="avatar" title="Φώτης">ΦΧ</div>
       </div>
-      <div class="tools">
-        <div class="seg" id="cats" role="group" aria-label="Κατηγορία"></div>
-        <button class="primary" type="button" id="add"><svg class="i"><use href="#i-plus"/></svg>Νέο έργο</button>
+      <div class="hero-text">
+        <h1 id="greet">Καλησπέρα, Φώτη</h1>
+        <p><span>Καλύτερα σχέδια</span><span>Καλύτερες συνήθειες</span><span>Μεγαλύτερος εαυτός</span></p>
+      </div>
+      <div class="motto">Πειθαρχία σήμερα,<br>ελευθερία αύριο.<i></i></div>
+    </section>
+
+    <div class="view" id="v-home">
+      <section class="stats" aria-label="Σύνοψη" id="stats"></section>
+
+      <div class="board" style="margin-top:16px">
+        <section class="panel" id="w-cal">
+          <div class="ph">
+            <h2><svg class="i"><use href="#i-cal"/></svg>Ημερολόγιο</h2>
+            <div class="cal-nav"><button class="link" type="button" id="cal-prev" aria-label="Προηγούμενο"><svg class="i"><use href="#i-left"/></svg></button><b id="cal-title"></b><button class="link" type="button" id="cal-next" aria-label="Επόμενο"><svg class="i"><use href="#i-right"/></svg></button></div>
+            <div class="seg" role="group" aria-label="Προβολή"><button type="button" data-cal="month" aria-pressed="true">Μήνας</button><button type="button" data-cal="week" aria-pressed="false">Εβδομάδα</button></div>
+          </div>
+          <div class="cal" id="cal"></div>
+        </section>
+
+        <div class="stack">
+        <section class="panel" id="w-focus">
+          <div class="ph"><h2><svg class="i"><use href="#i-target"/></svg>Σημερινή εστίαση</h2><span class="link" id="focus-count"></span></div>
+          <div class="list" id="focus"></div>
+          <form class="inline-add" id="focus-add"><input id="focus-in" placeholder="Νέα εργασία για σήμερα…" aria-label="Νέα εργασία"><select id="focus-tag" aria-label="Κατηγορία"></select></form>
+        </section>
+
+        <section class="panel notes" id="w-notes">
+          <div class="ph"><h2><svg class="i"><use href="#i-note"/></svg>Γρήγορες σημειώσεις</h2></div>
+          <div class="list" id="notes"></div>
+          <form class="inline-add" id="note-add"><input id="note-in" placeholder="Νέα σημείωση…" aria-label="Νέα σημείωση"></form>
+        </section>
+        </div>
+
+        <section class="panel" id="w-habits">
+          <div class="ph"><h2><svg class="i"><use href="#i-repeat"/></svg>Συνήθειες</h2><span class="link" id="habit-week"></span></div>
+          <table class="habits" id="habits"></table>
+          <button class="add" type="button" id="habit-add"><svg class="i"><use href="#i-plus"/></svg>Νέα συνήθεια</button>
+        </section>
+
+        <section class="panel" id="w-goals">
+          <div class="ph"><h2><svg class="i"><use href="#i-target"/></svg>Στόχοι</h2><button class="link" type="button" id="goal-add">Νέος <svg class="i" style="width:14px;height:14px"><use href="#i-plus"/></svg></button></div>
+          <div id="goals"></div>
+        </section>
+
+        <section class="panel" id="w-motiv">
+          <div class="ph"><h2><svg class="i"><use href="#i-mountain"/></svg>Έμπνευση</h2></div>
+          <div class="motiv"><canvas id="motiv-cv" aria-hidden="true"></canvas><p id="motiv-text"></p></div>
+        </section>
+
+        <section class="panel" id="w-week">
+          <div class="ph"><h2><svg class="i"><use href="#i-flag"/></svg>Στόχοι εβδομάδας</h2></div>
+          <div class="list" id="week"></div>
+          <button class="btn-soft" type="button" id="week-add"><svg class="i" style="width:14px;height:14px"><use href="#i-plus"/></svg>Νέος στόχος</button>
+        </section>
+
+        <section class="panel" id="w-journal">
+          <div class="ph"><h2><svg class="i"><use href="#i-book"/></svg>Ημερολόγιο σκέψεων</h2><button class="link" type="button" id="journal-add">Νέα εγγραφή <svg class="i" style="width:14px;height:14px"><use href="#i-plus"/></svg></button></div>
+          <div id="journal"></div>
+        </section>
+
+        <section class="panel quote" id="w-quote" title="Πάτα για άλλη φράση">
+          <span class="mark">“</span>
+          <blockquote id="quote-text"></blockquote>
+          <cite id="quote-by"></cite>
+          <svg class="i leaf" viewBox="0 0 24 24"><use href="#i-leaf"/></svg>
+        </section>
       </div>
     </div>
 
-    <div class="subbar" id="subbar">
-      <label class="search"><svg class="i"><use href="#i-search"/></svg><input type="search" id="q" placeholder="Αναζήτηση έργου…" aria-label="Αναζήτηση έργου"></label>
-      <div class="group" id="status-f" role="group" aria-label="Κατάσταση"></div>
-      <div class="stats" id="stats"></div>
+    <div class="view" id="v-projects" hidden>
+      <div class="pv-head">
+        <h1 id="pv-title">Τα έργα μου</h1>
+        <div class="pills" id="cat-pills" role="group" aria-label="Κατηγορία"></div>
+        <div class="pills" id="st-pills" role="group" aria-label="Κατάσταση"></div>
+        <button class="primary" type="button" id="proj-add"><svg class="i"><use href="#i-plus"/></svg>Νέο έργο</button>
+      </div>
+      <div class="grid" id="grid"></div>
     </div>
-
-    <section class="grid" id="grid" aria-live="polite"></section>
   </main>
 </div>
 
-<div class="scrim" id="scrim">
-  <form class="dlg glass" id="form" role="dialog" aria-modal="true" aria-labelledby="dlg-h">
-    <h2 id="dlg-h">Νέο έργο</h2>
-    <label for="f-title">Τίτλος<input id="f-title" required maxlength="60" placeholder="π.χ. Ανακαίνιση μπάνιου"></label>
-    <label for="f-sub">Περιγραφή<input id="f-sub" maxlength="90" placeholder="Μια γραμμή για το τι αφορά"></label>
-    <div class="row">
-      <label for="f-cat">Κατηγορία<select id="f-cat"></select></label>
-      <label for="f-due">Προθεσμία<input id="f-due" type="date"></label>
-    </div>
-    <div class="row">
-      <label for="f-status">Κατάσταση<select id="f-status"></select></label>
-      <label for="f-prog">Πρόοδος %<input id="f-prog" type="number" min="0" max="100" value="0"></label>
-    </div>
-    <div class="actions">
-      <button type="button" class="ghost" id="cancel">Άκυρο</button>
-      <button type="submit" class="primary">Προσθήκη</button>
-    </div>
-  </form>
-</div>
+<div class="scrim" id="modal"><form class="dlg" id="modal-form" role="dialog" aria-modal="true" aria-labelledby="modal-h"></form></div>
+
 <div class="scrim" id="setup">
-  <form class="dlg glass" id="setup-form" aria-labelledby="setup-h">
+  <form class="dlg" id="setup-form" aria-labelledby="setup-h">
     <div class="login-brand"><img src="icon-180.png" alt=""><h2 id="setup-h">Σύνδεση</h2></div>
-    <h2 class="setup-extra">Ρυθμίσεις συγχρονισμού</h2>
-    <label for="s-user">Όνομα χρήστη<input id="s-user" autocomplete="username" autocapitalize="off" spellcheck="false" ></label>
-    <label for="s-token">Κωδικός<input id="s-token" type="password" autocomplete="current-password" ></label>
+    <h2 class="setup-extra">Ρυθμίσεις</h2>
+    <label for="s-user">Όνομα χρήστη<input id="s-user" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+    <label for="s-token">Κωδικός<input id="s-token" type="password" autocomplete="current-password"></label>
     <p class="hint err" id="s-err" role="alert"></p>
     <div class="actions">
-      <button type="button" class="ghost" id="s-disconnect" hidden>Αποσύνδεση</button>
+      <button type="button" class="danger" id="s-disconnect" hidden>Αποσύνδεση</button>
       <button type="button" class="ghost" id="s-close">Κλείσιμο</button>
       <button type="submit" class="primary">Σύνδεση</button>
     </div>
   </form>
 </div>
-<div class="toast glass" id="toast" role="status"></div>
+<div class="toast" id="toast" role="status"></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-check-sq" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
   <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></symbol>
   <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
-  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
-  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
-  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
-  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
-  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h0"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
-  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 12 5 5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
-  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
-  <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></symbol>
-  <symbol id="i-handshake" viewBox="0 0 24 24"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.9-3.9a3 3 0 0 0-4.2 0l-.9.9a1 1 0 1 1-3-3l2.8-2.8a5.8 5.8 0 0 1 7.1-.9l.5.3a3 3 0 0 0 2 .4H21"/><path d="m21 3 1 11h-2M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3M3 4h8"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 22V4M4 4h13l-2 4 2 4H4"/></symbol>
+  <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m8 3 4 8 5-5 5 15H2z"/></symbol>
   <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10z"/><path d="M2 21c0-3 1.9-5.4 5-6"/></symbol>
-  <symbol id="i-check-sm" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+  <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol>
+  <symbol id="i-check-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m12 12 4-4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h0"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+  <symbol id="h-dumbbell" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></symbol>
+  <symbol id="h-book" viewBox="0 0 24 24"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2zM22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></symbol>
+  <symbol id="h-lotus" viewBox="0 0 24 24"><path d="M12 20c-4 0-8-2-9-6 3 0 6 1 9 4 3-3 6-4 9-4-1 4-5 6-9 6z"/><path d="M12 18c-2-2-3-5-3-8 0-2 1-4 3-6 2 2 3 4 3 6 0 3-1 6-3 8z"/></symbol>
+  <symbol id="h-nophone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></symbol>
+  <symbol id="h-drop" viewBox="0 0 24 24"><path d="M12 3s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/></symbol>
+  <symbol id="h-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="h-run" viewBox="0 0 24 24"><circle cx="13" cy="4" r="2"/><path d="m4 21 4-6 3 2 2-5 3 3h4M8 11l3-3 3 1"/></symbol>
+  <symbol id="h-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
 </svg>
 
 <script>
-// ===== Κατηγορίες (άλλαξε εδώ ονόματα / χρώματα) =====
+// ===================== Ρυθμίσεις =====================
 const CATS = [
-  { id: "own",     name: "Η εταιρία μου",          short: "Εταιρία",   color: "#5b8def", icon: "i-briefcase" },
-  { id: "partner", name: "Συνεργαζόμενη εταιρία",  short: "Συνεργάτης", color: "#d9a441", icon: "i-handshake" },
-  { id: "home",    name: "Hobbies & Σπίτι",        short: "Προσωπικά", color: "#4fbf7f", icon: "i-leaf" },
+  { id: "own",     name: "Η εταιρία μου",         short: "Εταιρία",    color: "#5b8def", icon: "i-briefcase" },
+  { id: "partner", name: "Συνεργαζόμενη εταιρία", short: "Συνεργάτης", color: "#e0a440", icon: "i-users" },
+  { id: "home",    name: "Hobbies & Σπίτι",        short: "Προσωπικά",  color: "#3fbf7f", icon: "i-leaf" },
 ];
 const STATUSES = [
-  { id: "active", name: "Σε εξέλιξη",   dot: "#8fd3ff" },
-  { id: "wait",   name: "Σε αναμονή",   dot: "#ffd166" },
+  { id: "active", name: "Σε εξέλιξη", dot: "#8fd3ff" },
+  { id: "wait",   name: "Σε αναμονή", dot: "#ffd166" },
   { id: "done",   name: "Ολοκληρώθηκε", dot: "#6fe39b" },
 ];
-const TODAY = new Date(); TODAY.setHours(0,0,0,0);
-const dayOffset = n => { const d = new Date(TODAY); d.setDate(d.getDate() + n); return d.toISOString().slice(0,10); };
+const HABIT_ICONS = [["h-dumbbell","Γυμναστική"],["h-book","Διάβασμα"],["h-lotus","Διαλογισμός"],["h-nophone","Χωρίς κινητό"],["h-drop","Νερό"],["h-moon","Ύπνος"],["h-run","Περπάτημα"],["h-star","Άλλο"]];
+const HABIT_COLORS = ["#3fbf7f","#6d5dfc","#5b8def","#ff6b8a","#3aa7ff","#e0a440","#ff8a4c","#b86bff"];
+const QUOTES = [
+  ["Η πειθαρχία είναι η γέφυρα ανάμεσα στους στόχους και στην επίτευξή τους.", "Jim Rohn"],
+  ["Δεν χρειάζεται να είσαι σπουδαίος για να ξεκινήσεις, αλλά πρέπει να ξεκινήσεις για να γίνεις σπουδαίος.", "Zig Ziglar"],
+  ["Ό,τι επαναλαμβάνουμε, αυτό γινόμαστε.", "Αριστοτέλης"],
+  ["Η αρχή είναι το ήμισυ του παντός.", "Πυθαγόρας"],
+  ["Η επιτυχία είναι το άθροισμα μικρών προσπαθειών, επαναλαμβανόμενων μέρα με τη μέρα.", "Robert Collier"],
+];
+const MOTIV = ["Λίγη πρόοδος κάθε μέρα φέρνει μεγάλα αποτελέσματα.", "Εστίασε σε αυτό που μετράει.", "Η συνέπεια νικάει το ταλέντο.", "Ένα βήμα τη φορά."];
+const DOW = ["Δευ","Τρί","Τετ","Πέμ","Παρ","Σάβ","Κυρ"];
+const DOW1 = ["Δ","Τ","Τ","Π","Π","Σ","Κ"];
+const MONTHS = ["Ιανουάριος","Φεβρουάριος","Μάρτιος","Απρίλιος","Μάιος","Ιούνιος","Ιούλιος","Αύγουστος","Σεπτέμβριος","Οκτώβριος","Νοέμβριος","Δεκέμβριος"];
 
-// Η εφαρμογή ξεκινάει άδεια: τα έργα έρχονται μόνο από το ιδιωτικό dashboard-data.
+// ===================== Βοηθητικά =====================
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
+const todayIso = iso(TODAY);
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const mondayOf = d => addDays(d, -((d.getDay() + 6) % 7));
+const daysTo = s => Math.round((parse(s) - TODAY) / 864e5);
+const fmtShort = s => { const d = parse(s); return d.toLocaleDateString("el-GR", { day: "numeric", month: "short" }); };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const catOf = id => CATS.find(c => c.id === id) || CATS[0];
+const stOf = id => STATUSES.find(s => s.id === id) || STATUSES[0];
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 1900); }
 
-let projects = [];
-let mode = "loading";
-const CFG_KEY = "gd-github", CACHE_KEY = "gd-cache";
+// ===================== Δεδομένα =====================
+const EMPTY = () => ({ projects: [], tasks: [], notes: [], habits: [], goals: [], weekGoals: [], journal: [] });
+let data = EMPTY();
+function normalize(v) { const d = EMPTY(); if (v && typeof v === "object") for (const k of Object.keys(d)) if (Array.isArray(v[k])) d[k] = v[k]; return d; }
+
+// ===================== Αποθήκευση στο ιδιωτικό GitHub repo =====================
+const CFG_KEY = "gd-github", CACHE_KEY = "gd-cache2";
 const DATA_REPO = "dashboard-data", DATA_FILE = "projects.json";
-let cfg = null, sha = null, saveTimer = null, saving = false, dirty = false;
+let cfg = null, sha = null, saveTimer = null, saving = false, dirty = false, loaded = false;
 try { cfg = JSON.parse(localStorage.getItem(CFG_KEY) || "null"); } catch (e) {}
-
 const b64enc = str => { const bytes = new TextEncoder().encode(str); let bin = ""; bytes.forEach(b => bin += String.fromCharCode(b)); return btoa(bin); };
 const b64dec = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, "")), c => c.charCodeAt(0)));
 const api = (path, opts = {}) => fetch(`https://api.github.com/repos/${cfg.user}/${DATA_REPO}/contents/${path}`, {
   ...opts, cache: "no-store",
   headers: { Authorization: `Bearer ${cfg.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(opts.headers || {}) },
 });
-
 function setSync(st) {
-  const el = document.getElementById("sync"); if (!el) return;
-  const map = { loading: ["#ffd166", "Συγχρονισμός…"], cloud: ["#6fe39b", "Συγχρονισμένο"], saving: ["#8fd3ff", "Αποθήκευση…"], error: ["#ff7a8a", "Χωρίς σύνδεση: οι αλλαγές θα σταλούν μόλις συνδεθείς"], local: ["#ffd166", "Δεν έχει ρυθμιστεί ο συγχρονισμός"] };
-  const [c, t] = map[st]; el.innerHTML = `<i style="background:${c}"></i>${t}`;
+  const map = { loading: ["#ffd166", "Συγχρονισμός…"], cloud: ["#3fcf7f", "Συγχρονισμένο"], saving: ["#8fd3ff", "Αποθήκευση…"], error: ["#ff6b7a", "Εκτός σύνδεσης, θα σταλεί αργότερα"] };
+  const [c, t] = map[st]; $("#sync").innerHTML = `<i style="background:${c}"></i>${t}`;
 }
-function cacheLocal() { try { localStorage.setItem(CACHE_KEY, JSON.stringify(projects)); } catch (e) {} }
-
+const cacheLocal = () => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {} };
 async function pull() {
   if (!cfg || saving || dirty) return;
   setSync("loading");
   try {
     const r = await api(DATA_FILE);
-    if (r.status === 404) { projects = []; sha = null; mode = "cloud"; setSync("cloud"); render(); return; }
-    if (r.status === 401 || r.status === 403) { setSync("error"); toast("Ο κωδικός δεν δουλεύει. Έλεγξέ τον στις Ρυθμίσεις."); return; }
+    if (r.status === 404) { sha = null; loaded = true; setSync("cloud"); renderAll(); return; }
+    if (r.status === 401 || r.status === 403) { setSync("error"); toast("Ο κωδικός δεν δουλεύει. Δες τις Ρυθμίσεις."); return; }
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
     sha = j.sha;
-    const v = JSON.parse(b64dec(j.content));
-    projects = Array.isArray(v.projects) ? v.projects : [];
-    mode = "cloud"; cacheLocal(); setSync("cloud"); render();
+    data = normalize(JSON.parse(b64dec(j.content)));
+    loaded = true; cacheLocal(); setSync("cloud"); renderAll();
   } catch (e) { setSync("error"); }
 }
-
 async function push() {
-  if (!cfg) return;
+  if (!cfg || !loaded) return;
   saving = true; dirty = false; setSync("saving");
-  const body = JSON.stringify({ updated: new Date().toISOString(), projects }, null, 1);
+  const body = JSON.stringify({ updated: new Date().toISOString(), ...data }, null, 1);
+  const put = () => api(DATA_FILE, { method: "PUT", body: JSON.stringify({ message: "Ενημέρωση", content: b64enc(body), ...(sha ? { sha } : {}) }) });
   try {
-    let r = await api(DATA_FILE, { method: "PUT", body: JSON.stringify({ message: "Ενημέρωση έργων", content: b64enc(body), ...(sha ? { sha } : {}) }) });
-    if (r.status === 409 || r.status === 422) {
-      const cur = await api(DATA_FILE); if (cur.ok) sha = (await cur.json()).sha;
-      r = await api(DATA_FILE, { method: "PUT", body: JSON.stringify({ message: "Ενημέρωση έργων", content: b64enc(body), ...(sha ? { sha } : {}) }) });
-    }
+    let r = await put();
+    if (r.status === 409 || r.status === 422) { const cur = await api(DATA_FILE); if (cur.ok) sha = (await cur.json()).sha; r = await put(); }
     if (!r.ok) throw new Error(r.status);
     sha = (await r.json()).content.sha;
     setSync("cloud");
@@ -341,269 +592,371 @@ async function push() {
   saving = false;
   if (dirty) { clearTimeout(saveTimer); saveTimer = setTimeout(push, 15000); }
 }
+function save() { cacheLocal(); renderAll(); if (!cfg) return; dirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(push, 700); }
 
-const save = () => {
-  cacheLocal();
-  if (!cfg) return;
-  dirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(push, 600);
-};
-
-function lock(on) { document.body.classList.toggle("locked", on); }
-function initCloud() {
-  if (!cfg) { lock(true); mode = "local"; openSetup(true); return; }
-  lock(false);
-  try { const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); if (Array.isArray(c)) { projects = c; render(); } } catch (e) {}
-  pull();
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pull(); });
-  addEventListener("focus", pull);
-  setInterval(() => { if (document.visibilityState === "visible") pull(); }, 60000);
+let started = false;
+function start() {
+  if (!cfg) { document.body.classList.add("locked"); paintScene($("#login-bg"), "night", true); openSetup(true); return; }
+  document.body.classList.remove("locked");
+  requestAnimationFrame(paintAll);
+  try { const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); if (c) data = normalize(c); } catch (e) {}
+  renderAll(); pull();
+  if (!started) {
+    started = true;
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pull(); });
+    setInterval(() => { if (document.visibilityState === "visible") pull(); }, 60000);
+  }
 }
 
-// Οθόνη ρύθμισης (μία φορά ανά συσκευή)
+// ===================== Σύνδεση / Ρυθμίσεις =====================
 function openSetup(first) {
-  const s = $("#setup");
-  $("#s-user").value = cfg?.user || "";
-  $("#s-token").value = "";
-  $("#s-err").textContent = "";
-  $("#s-disconnect").hidden = !cfg;
-  $("#s-close").hidden = first && !cfg;
-  s.classList.add("open");
+  $("#s-user").value = cfg?.user || ""; $("#s-token").value = ""; $("#s-err").textContent = "";
+  $("#s-disconnect").hidden = !cfg; $("#s-close").hidden = first && !cfg;
+  $("#setup").classList.add("open");
   setTimeout(() => (cfg ? $("#s-token") : $("#s-user")).focus(), 50);
 }
-async function submitSetup(e) {
+$("#setup-form").addEventListener("submit", async e => {
   e.preventDefault();
-  const user = $("#s-user").value.trim().replace(/^@/, "");
-  const token = $("#s-token").value.trim() || cfg?.token;
+  const user = $("#s-user").value.trim().replace(/^@/, ""), token = $("#s-token").value.trim() || cfg?.token;
   if (!user || !token) { $("#s-err").textContent = "Συμπλήρωσε όνομα χρήστη και κωδικό."; return; }
   $("#s-err").textContent = "Έλεγχος…";
   try {
     const h = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" };
     const me = await fetch("https://api.github.com/user", { cache: "no-store", headers: h });
-    if (me.status === 401) { $("#s-err").textContent = "Ο κωδικός δεν αναγνωρίζεται (401). Αντέγραψέ τον ξανά ολόκληρο, ή φτιάξε νέο."; return; }
+    if (me.status === 401) { $("#s-err").textContent = "Ο κωδικός δεν αναγνωρίζεται. Αντέγραψέ τον ξανά ολόκληρο."; return; }
     const r = await fetch(`https://api.github.com/repos/${user}/${DATA_REPO}`, { cache: "no-store", headers: h });
-    if (r.status === 404) { $("#s-err").textContent = `Ο κωδικός είναι σωστός, αλλά δεν βλέπει το «${user}/${DATA_REPO}» (404). Έλεγξε ότι υπάρχει αυτό το repository και ότι το επέλεξες στο Repository access του κωδικού.`; return; }
-    if (!r.ok) { $("#s-err").textContent = `Σφάλμα GitHub (${r.status}).`; return; }
-    const j = await r.json();
-    if (j.permissions && j.permissions.push === false) { $("#s-err").textContent = "Ο κωδικός μπορεί μόνο να διαβάσει. Στο Contents βάλε «Read and write»."; return; }
+    if (r.status === 404) { $("#s-err").textContent = `Ο κωδικός δεν βλέπει το «${user}/${DATA_REPO}».`; return; }
+    if (!r.ok) { $("#s-err").textContent = `Σφάλμα (${r.status}).`; return; }
   } catch (err) { $("#s-err").textContent = "Δεν υπάρχει σύνδεση στο internet."; return; }
-  const firstTime = !cfg;
-  cfg = { user, token };
-  try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (err) {}
-  $("#setup").classList.remove("open");
-  if (firstTime) initCloud(); else pull();
-  if (firstTime) toast("Καλώς ήρθες!");
+  cfg = { user, token }; try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (err) {}
+  $("#setup").classList.remove("open"); start();
+});
+$("#s-close").addEventListener("click", () => $("#setup").classList.remove("open"));
+$("#s-disconnect").addEventListener("click", () => {
+  try { localStorage.removeItem(CFG_KEY); localStorage.removeItem(CACHE_KEY); } catch (e) {}
+  cfg = null; sha = null; loaded = false; data = EMPTY(); $("#setup").classList.remove("open"); start();
+});
+
+// ===================== Γενικό παράθυρο φόρμας =====================
+let modalSubmit = null;
+function openModal({ title, fields, values = {}, onSave, onDelete }) {
+  const f = $("#modal-form");
+  f.innerHTML = `<h2 id="modal-h">${esc(title)}</h2>` + fields.map(fd => {
+    const v = values[fd.key] ?? fd.def ?? "";
+    const id = "m-" + fd.key;
+    if (fd.type === "select") return `<label for="${id}">${fd.label}<select id="${id}">${fd.options.map(([val, lab]) => `<option value="${esc(val)}" ${String(val) === String(v) ? "selected" : ""}>${esc(lab)}</option>`).join("")}</select></label>`;
+    if (fd.type === "textarea") return `<label for="${id}">${fd.label}<textarea id="${id}">${esc(v)}</textarea></label>`;
+    if (fd.type === "range") return `<label for="${id}">${fd.label}: <output id="${id}-o">${v || 0}%</output><input id="${id}" type="range" min="0" max="100" step="5" value="${v || 0}" oninput="document.getElementById('${id}-o').textContent=this.value+'%'"></label>`;
+    return `<label for="${id}">${fd.label}<input id="${id}" type="${fd.type || "text"}" value="${esc(v)}" ${fd.required ? "required" : ""} maxlength="${fd.max || 120}"></label>`;
+  }).join("") + `<div class="actions">${onDelete ? `<button type="button" class="danger" id="m-del">Διαγραφή</button>` : ""}<button type="button" class="ghost" id="m-cancel">Άκυρο</button><button type="submit" class="primary">Αποθήκευση</button></div>`;
+  modalSubmit = () => { const out = {}; fields.forEach(fd => { const el = document.getElementById("m-" + fd.key); out[fd.key] = fd.type === "range" ? +el.value : el.value.trim(); }); onSave(out); };
+  $("#m-cancel").onclick = closeModal;
+  if (onDelete) $("#m-del").onclick = () => { onDelete(); closeModal(); };
+  $("#modal").classList.add("open");
+  setTimeout(() => f.querySelector("input,textarea,select")?.focus(), 30);
 }
-const state = { cat: "all", status: new Set(), q: "", quick: "all" };
-const $ = s => document.querySelector(s);
-const catOf = id => CATS.find(c => c.id === id);
-const stOf = id => STATUSES.find(s => s.id === id);
-const daysTo = iso => Math.round((new Date(iso) - TODAY) / 864e5);
-const fmtDate = iso => new Date(iso).toLocaleDateString("el-GR", { day: "numeric", month: "short" });
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function closeModal() { $("#modal").classList.remove("open"); }
+$("#modal-form").addEventListener("submit", e => { e.preventDefault(); modalSubmit?.(); closeModal(); });
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+const catOptions = CATS.map(c => [c.id, c.name]);
 
-function buildControls() {
-  $("#cats").innerHTML = `<button type="button" data-cat="all" aria-pressed="true">Όλα</button>` +
-    CATS.map(c => `<button type="button" data-cat="${c.id}" aria-pressed="false"><span class="dot" style="background:${c.color}"></span>${c.name}</button>`).join("");
-  $("#status-f").innerHTML = STATUSES.map(s => `<button type="button" class="mini" data-st="${s.id}" aria-pressed="false">${s.name}</button>`).join("");
-  $("#f-cat").innerHTML = CATS.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
-  $("#f-status").innerHTML = STATUSES.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
-}
-
-function filtered() {
-  const q = state.q.trim().toLowerCase();
-  return projects.filter(p =>
-    (state.cat === "all" || p.cat === state.cat) &&
-    (!state.status.size || state.status.has(p.status)) &&
-    (!q || (p.title + " " + p.sub).toLowerCase().includes(q)) &&
-    (state.quick === "all" ||
-     (state.quick === "fav" && p.fav) ||
-     (state.quick === "done" && p.status === "done") ||
-     (state.quick === "late" && p.status !== "done" && daysTo(p.due) < 0) ||
-     (state.quick === "today" && p.status !== "done" && daysTo(p.due) >= 0 && daysTo(p.due) <= 7)));
-}
-
-function render() {
-  document.querySelectorAll("[data-cat]").forEach(b => b.setAttribute("aria-pressed", b.dataset.cat === state.cat));
-  document.querySelectorAll("[data-st]").forEach(b => b.setAttribute("aria-pressed", state.status.has(b.dataset.st)));
-  document.querySelectorAll("[data-quick]").forEach(b => b.setAttribute("aria-pressed", b.dataset.quick === state.quick));
-
-  const scope = state.cat === "all" ? projects : projects.filter(p => p.cat === state.cat);
-  const active = scope.filter(p => p.status !== "done");
-  const late = active.filter(p => daysTo(p.due) < 0).length;
-  const avg = active.length ? Math.round(active.reduce((a, p) => a + +p.prog, 0) / active.length) : 0;
-  $("#title").textContent = state.cat === "all" ? "Τα έργα μου" : catOf(state.cat).name;
-  $("#subtitle").textContent = `${active.length} ενεργά · ${scope.length - active.length} ολοκληρωμένα`;
-  $("#stats").innerHTML = `<span><b>${avg}%</b>μέση πρόοδος</span><span><b style="color:${late ? "#ff9a9a" : "#fff"}">${late}</b>σε καθυστέρηση</span>`;
-
-  const list = filtered().sort((a, b) => (a.status === "done") - (b.status === "done") || new Date(a.due) - new Date(b.due));
-  $("#grid").innerHTML = list.length ? list.map(p => {
-    const c = catOf(p.cat), s = stOf(p.status), d = daysTo(p.due);
-    const dueTxt = p.status === "done" ? `Ολοκλ. · ${fmtDate(p.due)}` : d < 0 ? `Έληξε πριν ${-d} ημ.` : d === 0 ? "Λήγει σήμερα" : `${fmtDate(p.due)} · σε ${d} ημ.`;
-    return `<article class="card" style="--c:${c.color}">
-      <div class="hero">
-        <svg class="i"><use href="#${c.icon}"/></svg>
-        <span class="st"><i style="background:${s.dot}"></i>${s.name}</span>
-        <span class="tag">${c.short}</span>
-      </div>
-      <div class="body">
-        <h3>${esc(p.title)}</h3>
-        <p>${esc(p.sub || "")}</p>
-        <div class="prog"><div class="track"><span style="width:${+p.prog}%"></span></div>${+p.prog}%</div>
-      </div>
-      <div class="foot">
-        <span class="meta ${p.status !== "done" && d < 0 ? "due-late" : ""}">${dueTxt}</span>
-        ${p.status !== "done" ? `<button type="button" data-done="${p.id}" aria-label="Σήμανση ως ολοκληρωμένο"><svg class="i"><use href="#i-check-sm"/></svg></button>` : ""}
-        <button type="button" data-fav="${p.id}" aria-pressed="${!!p.fav}" aria-label="Αγαπημένο"><svg class="i"><use href="#i-bookmark"/></svg></button>
-      </div>
-    </article>`;
-  }).join("") : `<div class="empty">${mode === "loading" ? "Φόρτωση έργων…" : projects.length ? "Κανένα έργο με αυτά τα φίλτρα." : "Δεν υπάρχουν ακόμη έργα. Πάτα «Νέο έργο» για να ξεκινήσεις."}</div>`;
+// ===================== Αρχική =====================
+function renderStats() {
+  const P = data.projects, active = P.filter(p => p.status !== "done");
+  const weekStart = mondayOf(TODAY), wkIso = iso(weekStart);
+  const doneWeek = P.filter(p => p.status === "done" && p.doneAt && p.doneAt >= wkIso).length;
+  const habitsToday = data.habits.filter(h => h.done?.[todayIso]).length;
+  const habitsY = data.habits.filter(h => h.done?.[iso(addDays(TODAY, -1))]).length;
+  const goals = data.goals, gAvg = goals.length ? Math.round(goals.reduce((a, g) => a + (+g.prog || 0), 0) / goals.length) : 0;
+  const gDone = goals.filter(g => +g.prog >= 100).length;
+  const late = active.filter(p => p.due && daysTo(p.due) < 0).length;
+  const soon = active.filter(p => p.due && daysTo(p.due) >= 0 && daysTo(p.due) <= 7).length;
+  const diff = habitsToday - habitsY;
+  const tile = (ico, color, corner, lbl, val, sub, extra = "") => `<div class="panel stat"><span class="ico" style="background:${color}"><svg class="i"><use href="#${ico}"/></svg></span><span class="lbl">${lbl}</span><svg class="i corner" style="color:${color}"><use href="#${corner}"/></svg><span class="val">${val}</span>${sub}${extra}</div>`;
+  $("#stats").innerHTML =
+    tile("i-clipboard", "#6d5dfc", "i-check-sq", "Ενεργά έργα", active.length, `<span class="sub up">↑ ${doneWeek} ολοκληρώθηκαν αυτή την εβδομάδα</span>`) +
+    tile("i-check-c", "#3fbf7f", "i-repeat", "Συνήθειες σήμερα", `${habitsToday}/${data.habits.length}`, `<span class="sub ${diff >= 0 ? "up" : "down"}">${diff >= 0 ? "↑" : "↓"} ${Math.abs(diff)} ${diff >= 0 ? "περισσότερες" : "λιγότερες"} από χθες</span>`) +
+    tile("i-target", "#5b8def", "i-gauge", "Πρόοδος στόχων", `${gDone}/${goals.length}`, "", `<div class="bar"><span style="width:${gAvg}%"></span></div><span class="sub">${gAvg}% μέσος όρος</span>`) +
+    tile("i-alert", late ? "#ff6b7a" : "#e0a440", "i-clock", "Προθεσμίες", late ? `${late} <small style="font-size:13px;font-weight:600;color:var(--bad)">καθυστερ.</small>` : soon, `<span class="sub">${soon} λήγουν τις επόμενες 7 ημέρες</span>`);
 }
 
-function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 1800); }
-
-document.addEventListener("click", e => {
-  const t = e.target.closest("button"); if (!t) return;
-  if (t.dataset.cat) { state.cat = t.dataset.cat; render(); }
-  else if (t.dataset.st) { const s = t.dataset.st; state.status.has(s) ? state.status.delete(s) : state.status.add(s); render(); }
-  else if (t.dataset.quick) { state.quick = t.dataset.quick; render(); }
-  else if (t.dataset.fav) { const p = projects.find(x => x.id == t.dataset.fav); p.fav = !p.fav; save(); render(); }
-  else if (t.dataset.done) { const p = projects.find(x => x.id == t.dataset.done); p.status = "done"; p.prog = 100; save(); render(); toast("Μπράβο, ολοκληρώθηκε!"); }
-  else if (t.dataset.view) {
-    document.querySelectorAll("[data-view]").forEach(b => b.removeAttribute("aria-current"));
-    t.setAttribute("aria-current", "page");
-    if (t.dataset.view === "goals") { state.cat = "home"; render(); }
-    else if (t.dataset.view === "projects" || t.dataset.view === "home") { state.cat = "all"; state.quick = "all"; render(); }
-    else openSetup(false);
+let calMode = "month", calRef = new Date(TODAY);
+function eventsOn(dIso) {
+  const ev = [];
+  data.projects.forEach(p => { if (p.due === dIso) ev.push({ kind: "p", id: p.id, title: p.title, c: catOf(p.cat).color, sub: "Προθεσμία", done: p.status === "done" }); });
+  data.tasks.forEach(t => { if (t.date === dIso) ev.push({ kind: "t", id: t.id, title: t.title, c: catOf(t.tag).color, sub: "Εργασία", done: t.done }); });
+  return ev;
+}
+function renderCal() {
+  let start, days;
+  if (calMode === "month") {
+    const first = new Date(calRef.getFullYear(), calRef.getMonth(), 1);
+    start = mondayOf(first); days = 42;
+    $("#cal-title").textContent = `${MONTHS[calRef.getMonth()]} ${calRef.getFullYear()}`;
+  } else {
+    start = mondayOf(calRef); days = 7;
+    const end = addDays(start, 6);
+    $("#cal-title").textContent = `${start.getDate()}/${start.getMonth() + 1} – ${end.getDate()}/${end.getMonth() + 1}`;
   }
+  const cap = calMode === "month" ? 2 : 8;
+  let html = DOW.map(d => `<div class="dow">${d}</div>`).join("");
+  for (let i = 0; i < days; i++) {
+    const d = addDays(start, i), di = iso(d), ev = eventsOn(di);
+    const out = calMode === "month" && d.getMonth() !== calRef.getMonth();
+    html += `<button type="button" class="day ${out ? "out" : ""} ${di === todayIso ? "today" : ""}" data-day="${di}" aria-label="${d.getDate()} ${MONTHS[d.getMonth()]}, ${ev.length} γεγονότα"><span class="n">${d.getDate()}</span>` +
+      ev.slice(0, cap).map(e => `<span class="ev ${e.done ? "done" : ""}" style="--c:${e.c}"><b>${esc(e.title)}</b><small>${e.sub}</small></span>`).join("") +
+      (ev.length > cap ? `<span class="more">+${ev.length - cap} ακόμη</span>` : "") + `</button>`;
+  }
+  const c = $("#cal"); c.innerHTML = html; c.classList.toggle("week", calMode === "week");
+  document.querySelectorAll("[data-cal]").forEach(b => b.setAttribute("aria-pressed", b.dataset.cal === calMode));
+}
+$("#cal-prev").onclick = () => { calMode === "month" ? calRef.setMonth(calRef.getMonth() - 1, 1) : calRef.setDate(calRef.getDate() - 7); renderCal(); };
+$("#cal-next").onclick = () => { calMode === "month" ? calRef.setMonth(calRef.getMonth() + 1, 1) : calRef.setDate(calRef.getDate() + 7); renderCal(); };
+document.querySelectorAll("[data-cal]").forEach(b => b.onclick = () => { calMode = b.dataset.cal; calRef = new Date(TODAY); renderCal(); });
+$("#cal").addEventListener("click", e => {
+  const d = e.target.closest("[data-day]"); if (!d) return;
+  openModal({ title: `Εργασία για ${fmtShort(d.dataset.day)}`, fields: [
+    { key: "title", label: "Τίτλος", required: true }, { key: "tag", label: "Κατηγορία", type: "select", options: catOptions }, { key: "date", label: "Ημερομηνία", type: "date" } ],
+    values: { date: d.dataset.day }, onSave: v => { if (!v.title) return; data.tasks.push({ id: uid(), title: v.title, tag: v.tag, date: v.date || d.dataset.day, done: false }); save(); } });
 });
-$("#q").addEventListener("input", e => { state.q = e.target.value; render(); });
-$("#btn-filters").addEventListener("click", () => $("#q").focus());
 
-// Νέο έργο
-const scrim = $("#scrim");
-$("#add").addEventListener("click", () => { $("#form").reset(); $("#f-due").value = dayOffset(14); if (state.cat !== "all") $("#f-cat").value = state.cat; scrim.classList.add("open"); $("#f-title").focus(); });
-$("#cancel").addEventListener("click", () => scrim.classList.remove("open"));
-scrim.addEventListener("click", e => { if (e.target === scrim) scrim.classList.remove("open"); });
-addEventListener("keydown", e => { if (e.key === "Escape") scrim.classList.remove("open"); });
-$("#form").addEventListener("submit", e => {
-  e.preventDefault();
-  const prog = Math.max(0, Math.min(100, +$("#f-prog").value || 0));
-  projects.push({ id: Date.now(), title: $("#f-title").value.trim(), sub: $("#f-sub").value.trim(), cat: $("#f-cat").value, status: $("#f-status").value, prog, due: $("#f-due").value || dayOffset(14), fav: false });
-  save(); scrim.classList.remove("open"); render(); toast("Το έργο προστέθηκε");
+function taskRow(t) {
+  const c = catOf(t.tag);
+  return `<div class="row ${t.done ? "done" : ""}"><button type="button" class="check" role="checkbox" aria-checked="${!!t.done}" data-task="${t.id}" aria-label="Ολοκλήρωση"></button><span class="grow t">${esc(t.title)}</span><span class="tag" style="--c:${c.color}">${c.short}</span><button type="button" class="x" data-del-task="${t.id}" aria-label="Διαγραφή"><svg class="i" style="width:14px;height:14px"><use href="#i-x"/></svg></button></div>`;
+}
+function renderFocus() {
+  const list = data.tasks.filter(t => t.date === todayIso || (!t.done && t.date && t.date < todayIso));
+  const done = list.filter(t => t.done).length;
+  $("#focus-count").textContent = list.length ? `${done}/${list.length}` : "";
+  $("#focus").innerHTML = list.length ? list.sort((a, b) => a.done - b.done).map(taskRow).join("") : `<p class="empty">Τίποτα για σήμερα. Γράψε παρακάτω την πρώτη σου εργασία.</p>`;
+}
+$("#focus-tag").innerHTML = CATS.map(c => `<option value="${c.id}">${c.short}</option>`).join("");
+$("#focus-add").addEventListener("submit", e => { e.preventDefault(); const t = $("#focus-in").value.trim(); if (!t) return; data.tasks.push({ id: uid(), title: t, tag: $("#focus-tag").value, date: todayIso, done: false }); $("#focus-in").value = ""; save(); });
+
+function renderNotes() {
+  $("#notes").innerHTML = data.notes.length ? data.notes.map(n => `<div class="row"><span class="grow">${esc(n.text)}</span><button type="button" class="x" data-del-note="${n.id}" aria-label="Διαγραφή"><svg class="i" style="width:14px;height:14px"><use href="#i-x"/></svg></button></div>`).join("") : `<p class="empty">Καμία σημείωση ακόμη.</p>`;
+}
+$("#note-add").addEventListener("submit", e => { e.preventDefault(); const t = $("#note-in").value.trim(); if (!t) return; data.notes.push({ id: uid(), text: t }); $("#note-in").value = ""; save(); });
+
+function renderHabits() {
+  const mon = mondayOf(TODAY), days = [...Array(7)].map((_, i) => addDays(mon, i));
+  $("#habit-week").textContent = `${mon.getDate()}/${mon.getMonth() + 1} – ${days[6].getDate()}/${days[6].getMonth() + 1}`;
+  if (!data.habits.length) { $("#habits").innerHTML = `<tr><td class="empty">Πρόσθεσε μια συνήθεια που θέλεις να χτίσεις.</td></tr>`; return; }
+  $("#habits").innerHTML = `<thead><tr><th scope="col">Συνήθεια</th>${DOW1.map(d => `<th scope="col">${d}</th>`).join("")}</tr></thead><tbody>` +
+    data.habits.map(h => `<tr><td><div class="hname" data-edit-habit="${h.id}" style="cursor:pointer"><span class="hico" style="--c:${h.color}"><svg class="i"><use href="#${h.icon}"/></svg></span>${esc(h.name)}</div></td>` +
+      days.map(d => { const di = iso(d), fut = di > todayIso; return `<td><button type="button" class="dot ${di === todayIso ? "today" : ""} ${fut ? "future" : ""}" ${fut ? "disabled" : ""} aria-pressed="${!!h.done?.[di]}" data-habit="${h.id}" data-d="${di}" aria-label="${esc(h.name)} ${DOW[(d.getDay() + 6) % 7]}"></button></td>`; }).join("") + `</tr>`).join("") + `</tbody>`;
+}
+function habitModal(h) {
+  openModal({ title: h ? "Συνήθεια" : "Νέα συνήθεια", fields: [
+    { key: "name", label: "Όνομα", required: true, max: 40 },
+    { key: "icon", label: "Εικονίδιο", type: "select", options: HABIT_ICONS },
+    { key: "color", label: "Χρώμα", type: "select", options: HABIT_COLORS.map((c, i) => [c, ["Πράσινο","Μωβ","Μπλε","Ροζ","Γαλάζιο","Χρυσό","Πορτοκαλί","Λιλά"][i]]) } ],
+    values: h || { color: HABIT_COLORS[data.habits.length % HABIT_COLORS.length] },
+    onSave: v => { if (!v.name) return; if (h) Object.assign(h, v); else data.habits.push({ id: uid(), ...v, done: {} }); save(); },
+    onDelete: h ? () => { data.habits = data.habits.filter(x => x !== h); save(); } : null });
+}
+$("#habit-add").onclick = () => habitModal(null);
+
+function renderGoals() {
+  $("#goals").innerHTML = data.goals.length ? data.goals.map(g => { const c = catOf(g.cat); return `<div class="goal" data-goal="${g.id}" style="--c:${c.color}" role="button" tabindex="0"><span class="gi"><svg class="i"><use href="#${c.icon}"/></svg></span><b>${esc(g.title)}</b><span class="pct">${+g.prog || 0}%</span><small>${esc(g.sub || "")}</small><div class="gb"><span style="width:${+g.prog || 0}%"></span></div><span class="gd">${g.due ? fmtShort(g.due) : ""}</span></div>`; }).join("") : `<p class="empty">Βάλε τους μεγάλους στόχους σου εδώ.</p>`;
+}
+function goalModal(g) {
+  openModal({ title: g ? "Στόχος" : "Νέος στόχος", fields: [
+    { key: "title", label: "Στόχος", required: true }, { key: "sub", label: "Περιγραφή" },
+    { key: "cat", label: "Κατηγορία", type: "select", options: catOptions }, { key: "due", label: "Έως", type: "date" }, { key: "prog", label: "Πρόοδος", type: "range" } ],
+    values: g || {}, onSave: v => { if (!v.title) return; if (g) Object.assign(g, v); else data.goals.push({ id: uid(), ...v }); save(); },
+    onDelete: g ? () => { data.goals = data.goals.filter(x => x !== g); save(); } : null });
+}
+$("#goal-add").onclick = () => goalModal(null);
+
+function ring(p, color) {
+  const r = 16, C = 2 * Math.PI * r;
+  return `<svg class="ring" viewBox="0 0 38 38" aria-hidden="true"><circle cx="19" cy="19" r="${r}" stroke="rgba(255,255,255,.1)"/><circle cx="19" cy="19" r="${r}" stroke="${color}" stroke-dasharray="${C * p / 100} ${C}" stroke-linecap="round" transform="rotate(-90 19 19)"/><text x="19" y="19">${p}%</text></svg>`;
+}
+function renderWeek() {
+  const colors = ["#6d5dfc", "#3fbf7f", "#e0a440", "#ff6b8a", "#5b8def"];
+  $("#week").innerHTML = data.weekGoals.length ? data.weekGoals.map((w, i) => `<div class="row" data-week="${w.id}" style="cursor:pointer">${ring(+w.prog || 0, colors[i % colors.length])}<span class="grow">${esc(w.title)}</span><span style="color:var(--ink-2);font-size:12px">${+w.prog || 0}%</span></div>`).join("") : `<p class="empty">Τι θέλεις να πετύχεις αυτή την εβδομάδα;</p>`;
+}
+function weekModal(w) {
+  openModal({ title: w ? "Στόχος εβδομάδας" : "Νέος στόχος εβδομάδας", fields: [{ key: "title", label: "Στόχος", required: true }, { key: "prog", label: "Πρόοδος", type: "range" }],
+    values: w || {}, onSave: v => { if (!v.title) return; if (w) Object.assign(w, v); else data.weekGoals.push({ id: uid(), ...v }); save(); },
+    onDelete: w ? () => { data.weekGoals = data.weekGoals.filter(x => x !== w); save(); } : null });
+}
+$("#week-add").onclick = () => weekModal(null);
+
+function renderJournal() {
+  const list = [...data.journal].sort((a, b) => (b.date || "").localeCompare(a.date || "")).slice(0, 4);
+  const grads = ["linear-gradient(135deg,#f7b267,#6d5dfc)", "linear-gradient(135deg,#9ad0ec,#3fbf7f)", "linear-gradient(135deg,#ff8a80,#5b8def)", "linear-gradient(135deg,#ffd166,#ef476f)"];
+  $("#journal").innerHTML = list.length ? list.map((j, i) => `<div class="jr" data-journal="${j.id}" role="button" tabindex="0"><time>${j.date ? fmtShort(j.date) : ""}</time><span class="thumb" style="background:${grads[i % grads.length]}"></span><div style="min-width:0"><b>${esc(j.title)}</b><span>${esc(j.text)}</span></div></div>`).join("") : `<p class="empty">Γράψε πώς πήγε η μέρα σου.</p>`;
+}
+function journalModal(j) {
+  openModal({ title: j ? "Εγγραφή" : "Νέα εγγραφή", fields: [{ key: "date", label: "Ημερομηνία", type: "date", def: todayIso }, { key: "title", label: "Τίτλος", required: true }, { key: "text", label: "Σκέψεις", type: "textarea" }],
+    values: j || {}, onSave: v => { if (!v.title) return; if (j) Object.assign(j, v); else data.journal.push({ id: uid(), ...v }); save(); },
+    onDelete: j ? () => { data.journal = data.journal.filter(x => x !== j); save(); } : null });
+}
+$("#journal-add").onclick = () => journalModal(null);
+
+let quoteIdx = TODAY.getDate() % QUOTES.length;
+function renderQuote() { const [t, by] = QUOTES[quoteIdx]; $("#quote-text").textContent = t; $("#quote-by").textContent = "— " + by; $("#motiv-text").textContent = MOTIV[TODAY.getDate() % MOTIV.length]; }
+$("#w-quote").onclick = () => { quoteIdx = (quoteIdx + 1) % QUOTES.length; renderQuote(); };
+
+// ===================== Έργα =====================
+const pstate = { cat: "all", st: "all", q: "" };
+function renderProjects() {
+  $("#cat-pills").innerHTML = `<button type="button" data-pcat="all" aria-pressed="${pstate.cat === "all"}">Όλα</button>` + CATS.map(c => `<button type="button" data-pcat="${c.id}" aria-pressed="${pstate.cat === c.id}"><i style="background:${c.color}"></i>${c.name}</button>`).join("");
+  $("#st-pills").innerHTML = `<button type="button" data-pst="all" aria-pressed="${pstate.st === "all"}">Όλες</button>` + STATUSES.map(s => `<button type="button" data-pst="${s.id}" aria-pressed="${pstate.st === s.id}">${s.name}</button>`).join("");
+  $("#pv-title").textContent = pstate.cat === "all" ? "Τα έργα μου" : catOf(pstate.cat).name;
+  const q = pstate.q.toLowerCase();
+  const list = data.projects.filter(p => (pstate.cat === "all" || p.cat === pstate.cat) && (pstate.st === "all" || p.status === pstate.st) && (!q || (p.title + " " + (p.sub || "")).toLowerCase().includes(q)))
+    .sort((a, b) => (a.status === "done") - (b.status === "done") || (a.due || "9").localeCompare(b.due || "9"));
+  $("#grid").innerHTML = list.length ? list.map(p => {
+    const c = catOf(p.cat), s = stOf(p.status), d = p.due ? daysTo(p.due) : null;
+    const due = !p.due ? "Χωρίς προθεσμία" : p.status === "done" ? `Ολοκλ. · ${fmtShort(p.due)}` : d < 0 ? `Έληξε πριν ${-d} ημ.` : d === 0 ? "Λήγει σήμερα" : `${fmtShort(p.due)} · σε ${d} ημ.`;
+    return `<article class="card" style="--c:${c.color}" data-proj="${p.id}"><div class="hd"><svg class="i"><use href="#${c.icon}"/></svg><span class="st"><i style="background:${s.dot}"></i>${s.name}</span><span class="ct">${c.short}</span></div>
+      <div class="bd"><h3>${esc(p.title)}</h3><p>${esc(p.sub || "")}</p><div class="pg"><div><span style="width:${+p.prog || 0}%"></span></div>${+p.prog || 0}%</div></div>
+      <div class="ft"><span class="${p.status !== "done" && d < 0 ? "late" : ""}">${due}</span>${p.status !== "done" ? `<button type="button" data-pdone="${p.id}" aria-label="Ολοκληρώθηκε"><svg class="i"><use href="#i-check"/></svg></button>` : ""}<button type="button" data-pfav="${p.id}" aria-pressed="${!!p.fav}" aria-label="Αγαπημένο"><svg class="i"><use href="#i-bookmark"/></svg></button></div></article>`;
+  }).join("") : `<p class="empty">Κανένα έργο εδώ ακόμη.</p>`;
+}
+function projModal(p) {
+  openModal({ title: p ? "Έργο" : "Νέο έργο", fields: [
+    { key: "title", label: "Τίτλος", required: true, max: 70 }, { key: "sub", label: "Περιγραφή" },
+    { key: "cat", label: "Κατηγορία", type: "select", options: catOptions }, { key: "status", label: "Κατάσταση", type: "select", options: STATUSES.map(s => [s.id, s.name]) },
+    { key: "due", label: "Προθεσμία", type: "date" }, { key: "prog", label: "Πρόοδος", type: "range" } ],
+    values: p || { cat: pstate.cat !== "all" ? pstate.cat : "own", due: iso(addDays(TODAY, 14)) },
+    onSave: v => { if (!v.title) return; if (v.status === "done") { v.prog = 100; v.doneAt = p?.doneAt || todayIso; } if (p) Object.assign(p, v); else data.projects.push({ id: uid(), fav: false, ...v }); save(); },
+    onDelete: p ? () => { data.projects = data.projects.filter(x => x !== p); save(); } : null });
+}
+$("#proj-add").onclick = () => projModal(null);
+
+// ===================== Γενικά κλικ =====================
+const byId = (arr, id) => arr.find(x => String(x.id) === String(id));
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-task],[data-del-task],[data-del-note],[data-habit],[data-edit-habit],[data-goal],[data-week],[data-journal],[data-pcat],[data-pst],[data-proj],[data-go]");
+  if (!t) return;
+  const ds = t.dataset;
+  if (ds.task) { const x = byId(data.tasks, ds.task); x.done = !x.done; save(); }
+  else if (ds.delTask) { data.tasks = data.tasks.filter(x => String(x.id) !== ds.delTask); save(); }
+  else if (ds.delNote) { data.notes = data.notes.filter(x => String(x.id) !== ds.delNote); save(); }
+  else if (ds.habit) { const h = byId(data.habits, ds.habit); h.done = h.done || {}; if (h.done[ds.d]) delete h.done[ds.d]; else h.done[ds.d] = true; save(); }
+  else if (ds.editHabit) habitModal(byId(data.habits, ds.editHabit));
+  else if (ds.goal) goalModal(byId(data.goals, ds.goal));
+  else if (ds.week) weekModal(byId(data.weekGoals, ds.week));
+  else if (ds.journal) journalModal(byId(data.journal, ds.journal));
+  else if (ds.pcat) { pstate.cat = ds.pcat; renderProjects(); }
+  else if (ds.pst) { pstate.st = ds.pst; renderProjects(); }
+  else if (ds.proj) {
+    const p = byId(data.projects, ds.proj);
+    const b = e.target.closest("[data-pdone],[data-pfav]");
+    if (b?.dataset.pdone) { p.status = "done"; p.prog = 100; p.doneAt = todayIso; save(); toast("Μπράβο, ολοκληρώθηκε!"); }
+    else if (b?.dataset.pfav) { p.fav = !p.fav; save(); }
+    else projModal(p);
+  }
+  else if (ds.go) go(ds.go);
 });
+document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.matches("[role=button][tabindex]")) { e.preventDefault(); e.target.click(); } });
 
-// Δικό σου φόντο
-$("#btn-bg").addEventListener("click", e => e.altKey ? $("#bgfile").click() : nextTheme());
-$("#bgfile").addEventListener("change", e => {
-  const f = e.target.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = () => { $("#bgimg").style.backgroundImage = `url(${r.result})`; try { localStorage.setItem("gd-bg", r.result); } catch (err) { toast("Η φωτογραφία είναι μεγάλη και δεν θα μείνει αποθηκευμένη"); } };
-  r.readAsDataURL(f);
-});
-try { const bg = localStorage.getItem("gd-bg"); if (bg) $("#bgimg").style.backgroundImage = `url(${bg})`; } catch (e) {}
+function go(where) {
+  document.querySelectorAll("[data-go]").forEach(b => b.toggleAttribute("aria-current", b.dataset.go === where || (where.startsWith("w-") && false)));
+  if (where === "settings") { openSetup(false); return; }
+  const proj = where === "projects";
+  $("#v-home").hidden = proj; $("#v-projects").hidden = !proj;
+  document.querySelectorAll("[data-go]").forEach(b => b.setAttribute("aria-current", b.dataset.go === where ? "page" : "false"));
+  if (proj) { renderProjects(); return; }
+  if (where.startsWith("w-")) { const el = document.getElementById(where); el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); el.animate?.([{ boxShadow: "0 0 0 2px rgba(143,131,255,.8)" }, { boxShadow: "0 0 0 2px rgba(143,131,255,0)" }], { duration: 1200 }); }
+  else scrollTo({ top: 0, behavior: "smooth" });
+}
+$("#q").addEventListener("input", e => { pstate.q = e.target.value; if ($("#v-projects").hidden && pstate.q) go("projects"); else renderProjects(); });
 
-// ===== Ζωγραφισμένο φόντο: βουνά πάνω από λίμνη, σε τρία θέματα =====
+function renderAll() {
+  const h = new Date().getHours();
+  $("#greet").textContent = `${h < 12 ? "Καλημέρα" : h < 19 ? "Καλησπέρα" : "Καλό βράδυ"}, Φώτη`;
+  $("#today").textContent = new Date().toLocaleDateString("el-GR", { weekday: "short", day: "numeric", month: "long", year: "numeric" });
+  renderStats(); renderCal(); renderFocus(); renderNotes(); renderHabits(); renderGoals(); renderWeek(); renderJournal(); renderQuote();
+  if (!$("#v-projects").hidden) renderProjects();
+}
+
+// ===================== Ζωγραφισμένα τοπία =====================
 const THEMES = {
-  sunset: { name: "Ηλιοβασίλεμα", sky: ["#1b2550", "#4a3477", "#a6497a", "#e57f62", "#fbc98e"], sun: "#fff0c8", glow: "255,190,140", haze: "#e39a8c", dark: "#1a1330", stars: 40, lake: "#2a1d3d" },
-  night:  { name: "Νύχτα", sky: ["#03050f", "#0a1430", "#1b2a5a", "#33467f", "#5b6ea6"], sun: "#f4f1e6", glow: "170,190,255", haze: "#4a5a92", dark: "#05070f", stars: 260, lake: "#060a1a", moon: true },
-  dawn:   { name: "Αυγή", sky: ["#5d86c4", "#8fb2df", "#d7d6e3", "#f4cdb3", "#fde4c9"], sun: "#fffaf0", glow: "255,225,190", haze: "#b9c6dc", dark: "#283449", stars: 0, lake: "#3c4b63" },
+  sunset: { sky: ["#141a3c", "#3b2b6b", "#8e4278", "#e07a5f", "#fbc98e"], sun: "#fff0c8", glow: "255,180,130", haze: "#c9808a", dark: "#0c0a1c", stars: 60 },
+  night:  { sky: ["#03050f", "#0a1430", "#1b2a5a", "#33467f", "#5b6ea6"], sun: "#f4f1e6", glow: "170,190,255", haze: "#4a5a92", dark: "#04060e", stars: 280, moon: true },
+  dawn:   { sky: ["#3e5f98", "#7c9fd2", "#cfd2e3", "#f4c9a8", "#fde0c2"], sun: "#fffaf0", glow: "255,220,180", haze: "#aab8d2", dark: "#1b2333", stars: 0 },
 };
 let themeKey = "sunset";
 try { const t = localStorage.getItem("gd-theme"); if (THEMES[t]) themeKey = t; } catch (e) {}
-function hex(c) { const n = parseInt(c.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
-function mix(a, b, t) { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(",")})`; }
-function paint() {
-  const T = THEMES[themeKey];
-  const cv = $("#bg"), dpr = Math.min(devicePixelRatio || 1, 2);
-  const W = innerWidth, H = innerHeight;
+const hex = c => { const n = parseInt(c.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+const mix = (a, b, t) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(",")})`; };
+function paintScene(cv, key, full, opts = {}) {
+  const T = THEMES[key], dpr = Math.min(devicePixelRatio || 1, 2);
+  const W = cv.clientWidth || innerWidth, H = cv.clientHeight || innerHeight;
   cv.width = W * dpr; cv.height = H * dpr;
   const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
-  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const horizon = Math.round(H * 0.66);
-
-  // Σκηνή πάνω από τον ορίζοντα σε ξεχωριστό καμβά (για την αντανάκλαση)
-  const up = document.createElement("canvas"); up.width = W * dpr; up.height = horizon * dpr;
-  const u = up.getContext("2d"); u.scale(dpr, dpr);
-  const sky = u.createLinearGradient(0, 0, 0, horizon);
+  let seed = opts.seed || 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const horizon = H * (full ? 0.66 : 0.92);
+  const sky = g.createLinearGradient(0, 0, 0, horizon);
   T.sky.forEach((c, i) => sky.addColorStop(i / (T.sky.length - 1), c));
-  u.fillStyle = sky; u.fillRect(0, 0, W, horizon);
-
-  for (let i = 0; i < T.stars; i++) {
-    const x = rnd() * W, y = Math.pow(rnd(), 1.6) * horizon * 0.75, r = rnd() * 1.2 + 0.2;
-    u.globalAlpha = (1 - y / (horizon * 0.75)) * (0.4 + rnd() * 0.6);
-    u.fillStyle = "#fff"; u.beginPath(); u.arc(x, y, r, 0, Math.PI * 2); u.fill();
+  g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < T.stars * (W * H) / 1.3e6; i++) {
+    const x = rnd() * W, y = Math.pow(rnd(), 1.6) * horizon * 0.7;
+    g.globalAlpha = (1 - y / (horizon * 0.7)) * (0.3 + rnd() * 0.7); g.fillStyle = "#fff";
+    g.beginPath(); g.arc(x, y, rnd() * 1.1 + 0.2, 0, 6.3); g.fill();
   }
-  u.globalAlpha = 1;
-
-  const sx = W * 0.66, sy = horizon - H * (T.moon ? 0.36 : 0.13), sr = Math.min(W, H) * (T.moon ? 0.035 : 0.055);
-  let glow = u.createRadialGradient(sx, sy, 0, sx, sy, Math.max(W, H) * 0.55);
-  glow.addColorStop(0, `rgba(${T.glow},.55)`); glow.addColorStop(0.15, `rgba(${T.glow},.22)`); glow.addColorStop(1, `rgba(${T.glow},0)`);
-  u.fillStyle = glow; u.fillRect(0, 0, W, horizon);
-  u.shadowColor = T.sun; u.shadowBlur = sr * 1.5; u.fillStyle = T.sun;
-  u.beginPath(); u.arc(sx, sy, sr, 0, Math.PI * 2); u.fill(); u.shadowBlur = 0;
-
-  // Οροσειρές με θόρυβο και ατμοσφαιρική προοπτική
+  g.globalAlpha = 1;
+  const sx = W * (opts.sunX ?? 0.72), sy = horizon - H * (T.moon ? 0.5 : 0.22), sr = Math.min(W, H) * (T.moon ? 0.05 : 0.07);
+  const glow = g.createRadialGradient(sx, sy, 0, sx, sy, Math.max(W, H) * 0.6);
+  glow.addColorStop(0, `rgba(${T.glow},.6)`); glow.addColorStop(0.18, `rgba(${T.glow},.22)`); glow.addColorStop(1, `rgba(${T.glow},0)`);
+  g.fillStyle = glow; g.fillRect(0, 0, W, H);
+  g.shadowColor = T.sun; g.shadowBlur = sr * 1.4; g.fillStyle = T.sun; g.beginPath(); g.arc(sx, sy, sr, 0, 6.3); g.fill(); g.shadowBlur = 0;
   const layers = 6;
+  let figure = null;
   for (let li = 0; li < layers; li++) {
     const t = li / (layers - 1);
-    const base = horizon - H * (0.2 - t * 0.17);
-    const amp = H * (0.13 - t * 0.07);
-    const ph = rnd() * 100, oct = [[1.3, 1], [3.1, 0.45], [7.7, 0.18], [19, 0.06], [41, 0.025]];
-    u.beginPath(); u.moveTo(0, horizon);
+    const base = horizon - H * (0.34 - t * 0.27), amp = H * (0.2 - t * 0.1);
+    const ph = rnd() * 100, oct = [[1.3, 1], [3.1, .45], [7.7, .18], [19, .06], [41, .025]];
+    const ys = [];
+    g.beginPath(); g.moveTo(0, H);
     for (let x = 0; x <= W; x += 3) {
       const k = x / W * 3 + ph; let h = 0;
-      oct.forEach(([f, a], j) => { h += a * (Math.sin(k * f + j * 1.7) * 0.5 + Math.sin(k * f * 1.9 + ph * j) * 0.5); });
-      const peak = Math.max(0, h) * 1.25 + h * 0.35;
-      u.lineTo(x, base - amp * peak);
+      oct.forEach(([f, a], j) => { h += a * (Math.sin(k * f + j * 1.7) * .5 + Math.sin(k * f * 1.9 + ph * j) * .5); });
+      const y = base - amp * (Math.max(0, h) * 1.25 + h * .35); ys.push([x, y]); g.lineTo(x, y);
     }
-    u.lineTo(W, horizon); u.closePath();
-    const col = mix(T.haze, T.dark, Math.pow(t, 0.8));
-    const mg = u.createLinearGradient(0, base - amp * 1.5, 0, horizon);
-    mg.addColorStop(0, col); mg.addColorStop(1, mix(T.haze, T.dark, Math.max(0, Math.pow(t, 0.8) - 0.25)));
-    u.fillStyle = mg; u.fill();
-    const mist = u.createLinearGradient(0, base - amp * 0.2, 0, horizon);
-    mist.addColorStop(0, "rgba(255,255,255,0)"); mist.addColorStop(1, `rgba(${T.glow},${0.12 * (1 - t) + 0.04})`);
-    u.fillStyle = mist; u.fillRect(0, base - amp * 0.2, W, horizon - base + amp * 0.2);
+    g.lineTo(W, H); g.closePath();
+    const col = mix(T.haze, T.dark, Math.pow(t, .75));
+    const mg = g.createLinearGradient(0, base - amp * 1.5, 0, H);
+    mg.addColorStop(0, col); mg.addColorStop(1, mix(T.haze, T.dark, Math.min(1, Math.pow(t, .75) + .15)));
+    g.fillStyle = mg; g.fill();
+    const mist = g.createLinearGradient(0, base - amp * .2, 0, base + amp);
+    mist.addColorStop(0, "rgba(255,255,255,0)"); mist.addColorStop(1, `rgba(${T.glow},${.14 * (1 - t) + .03})`);
+    g.fillStyle = mist; g.fillRect(0, base - amp * .2, W, amp * 1.2 + H * .1);
+    if (li === layers - 1) figure = ys;
   }
-
-  g.drawImage(up, 0, 0, W, horizon);
-
-  // Λίμνη: αντανάκλαση, σκίαση, κυματάκια
-  g.save(); g.translate(0, horizon * 2); g.scale(1, -1);
-  g.globalAlpha = 0.75; g.filter = "blur(2px)"; g.drawImage(up, 0, 0, W, horizon); g.restore();
-  g.filter = "none"; g.globalAlpha = 1;
-  const lk = g.createLinearGradient(0, horizon, 0, H);
-  lk.addColorStop(0, `rgba(${hex(T.lake).join(",")},.35)`); lk.addColorStop(1, `rgba(${hex(T.lake).join(",")},.92)`);
-  g.fillStyle = lk; g.fillRect(0, horizon, W, H - horizon);
-  for (let i = 0; i < 140; i++) {
-    const y = horizon + Math.pow(rnd(), 1.5) * (H - horizon), w = 20 + rnd() * 160 * (1 + (y - horizon) / (H - horizon));
-    const x = Math.abs(rnd() * W - sx) < W * 0.12 ? sx + (rnd() - 0.5) * W * 0.2 : rnd() * W;
-    g.fillStyle = `rgba(255,255,255,${0.04 + rnd() * 0.08})`; g.fillRect(x - w / 2, y, w, 1);
+  // Πεζοπόρος πάνω σε βράχο (μόνο στην κεφαλίδα)
+  if (opts.hiker && figure) {
+    const fx = W * 0.6, rockTop = H * 0.62, rh = H - rockTop;
+    g.fillStyle = T.dark;
+    g.beginPath(); g.moveTo(fx - W * .14, H); g.lineTo(fx - W * .07, rockTop + rh * .3); g.lineTo(fx - W * .02, rockTop + rh * .05); g.lineTo(fx + W * .03, rockTop); g.lineTo(fx + W * .06, rockTop + rh * .2); g.lineTo(fx + W * .12, rockTop + rh * .55); g.lineTo(fx + W * .2, H); g.closePath(); g.fill();
+    const s = H * 0.0028, px = fx + W * .012, py = rockTop + 1;
+    g.save(); g.translate(px, py); g.scale(s, s); g.fillStyle = T.dark;
+    g.beginPath(); g.arc(0, -62, 7, 0, 6.3); g.fill();
+    g.beginPath(); g.moveTo(-9, -54); g.lineTo(9, -54); g.lineTo(11, -26); g.lineTo(7, -24); g.lineTo(8, 0); g.lineTo(2, 0); g.lineTo(0, -22); g.lineTo(-3, 0); g.lineTo(-9, 0); g.lineTo(-8, -24); g.lineTo(-12, -26); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(-10, -52); g.lineTo(-20, -48); g.lineTo(-19, -26); g.lineTo(-9, -28); g.closePath(); g.fill();
+    g.restore();
   }
-  g.fillStyle = `rgba(${T.glow},.35)`; g.fillRect(0, horizon, W, 1);
-
-  // Κόκκος φιλμ και βινιέτα
   const n = document.createElement("canvas"); n.width = n.height = 128;
   const nx = n.getContext("2d"), id = nx.createImageData(128, 128);
-  for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 14; }
-  nx.putImageData(id, 0, 0);
-  g.fillStyle = g.createPattern(n, "repeat"); g.fillRect(0, 0, W, H);
-  const v = g.createRadialGradient(W / 2, H * 0.45, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.85);
-  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(5,3,12,.5)");
-  g.fillStyle = v; g.fillRect(0, 0, W, H);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", T.sky[0]);
+  for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 12; }
+  nx.putImageData(id, 0, 0); g.fillStyle = g.createPattern(n, "repeat"); g.fillRect(0, 0, W, H);
 }
-function nextTheme() {
-  const keys = Object.keys(THEMES); themeKey = keys[(keys.indexOf(themeKey) + 1) % keys.length];
-  try { localStorage.setItem("gd-theme", themeKey); localStorage.removeItem("gd-bg"); } catch (e) {}
-  $("#bgimg").style.backgroundImage = ""; paint(); toast(`Φόντο: ${THEMES[themeKey].name}`);
+function paintAll() {
+  if (document.body.classList.contains("locked")) { paintScene($("#login-bg"), "night", true); return; }
+  paintScene($("#hero-cv"), themeKey, false, { hiker: true, sunX: 0.62 });
+  paintScene($("#motiv-cv"), "night", false, { seed: 21, sunX: 0.8 });
 }
-let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(paint, 120); });
+$("#btn-theme").onclick = () => { const k = Object.keys(THEMES); themeKey = k[(k.indexOf(themeKey) + 1) % k.length]; try { localStorage.setItem("gd-theme", themeKey); } catch (e) {} paintAll(); };
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(paintAll, 150); });
 
-buildControls(); render(); paint(); initCloud();
-$("#setup-form").addEventListener("submit", submitSetup);
-$("#s-close").addEventListener("click", () => $("#setup").classList.remove("open"));
-$("#s-disconnect").addEventListener("click", () => { try { localStorage.removeItem(CFG_KEY); } catch (e) {} try { localStorage.removeItem(CACHE_KEY); } catch (e) {} cfg = null; sha = null; projects = []; render(); lock(true); openSetup(true); });
+start();
+requestAnimationFrame(paintAll);
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
